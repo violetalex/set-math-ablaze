@@ -1,0 +1,16 @@
+import Mathlib
+#check @ProbabilityTheory.IsPreBrownianReal
+#check @MeasureTheory.Submartingale.expected_stoppedValue_mono
+#check @MeasureTheory.Integrable
+#check @MeasureTheory.IntegrableOn
+#check @intervalIntegral.integral_nonneg
+#check @IntervalIntegrable
+#check @MeasureTheory.MemLp
+#check @ENNReal.lintegral_mul_le_Lp_mul_Lq
+#check @MeasureTheory.Integrable.mono
+#check @MeasureTheory.integral_mono
+#check @Filter.Tendsto.atTop_of_forall
+#check @tendsto_atTop_mono
+#check @Set.Finite.exists_max_image
+#check @Function.invFun
+#check @StrictMono.invFun

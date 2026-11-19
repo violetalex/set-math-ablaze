@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  workflow:
+    name: checker (python)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit tests
+        working-directory: workflow
+        run: python3 -I run_tests.py
+      - name: Gate self-test
+        working-directory: workflow
+        run: ./bin/mathlean selfcheck
+
+  formalization:
+    name: formalization (lean)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with Lean
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: formalization
+          build: true
+          test: false
+          lint: false
+      - name: Five gates
+        working-directory: formalization
+        run: bash scripts/check.sh

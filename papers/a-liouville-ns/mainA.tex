@@ -1,0 +1,1430 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage[capitalise,nameinlink]{cleveref}
+\crefname{hypothesis}{Hypothesis}{Hypotheses}
+\crefname{condition}{Condition}{Conditions}
+\crefname{openproblem}{Open Problem}{Open Problems}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{hypothesis}[theorem]{Hypothesis}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{condition}[theorem]{Condition}
+\newtheorem{openproblem}[theorem]{Open Problem}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\Div}{\operatorname{div}}
+\newcommand{\grad}{\nabla}
+\emergencystretch=1.5em
+
+\title{A conditional Liouville theorem for ancient axisymmetric\\
+Navier--Stokes flow with swirl at the critical endpoint}
+\author{Fan Li\\[8pt]
+{\small School of Petroleum Engineering, China University of Petroleum (East China),}\\[2pt]
+{\small Qingdao 266580, China}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We consider ancient (global backward in time) axisymmetric solutions of the
+three-dimensional incompressible Navier--Stokes equations with swirl, in the
+scaling-critical class of Koch--Nadirashvili--Seregin--\v{S}ver\'ak at the
+exponent $\gamma=0$: $|u|\lesssim R^{0}$, $|\omega|\lesssim R^{-1}$,
+$|\Gamma|\le C$ and $p\gtrsim-1$, where $R=1+|x|+\sqrt{-t}$ and
+$\Gamma=\rho u^\theta$ is the swirl. Modulo the swirl-free Liouville theorem,
+the endpoint is equivalent to $\Gamma\equiv0$. We prove that $\Gamma\equiv0$
+whenever the radial velocity is non-negative, $b^\rho\ge0$. The proof is an
+exact maximum principle for the lifted variable $\Phi=\Gamma/\rho^2$ on
+$\R^5$, where $\Phi$ solves $\partial_t\Phi+\Div_5(b\Phi)=\nu\Delta_5\Phi$ and
+the obstruction is the sign of $V_0=\Div_5b=2b^\rho/\rho$. We show that the
+hypothesis is sharp inside the class of radial weights: among the weights
+$\rho^a$, only $a=2$ retains the backward uniform decay that the argument
+requires. We reduce the remaining case to a scale-free sufficient condition
+$(\star)$ on $\R^5$, prove an averaged necessary condition and a dual
+sufficient condition for it, and give an explicit counterexample showing that
+the linear five-dimensional theory alone cannot decide the sign. The
+two-dimensional bounded-class lemma that closes the last step is treated in a
+companion paper. No unconditional $\gamma=0$ theorem is claimed.
+\end{abstract}
+
+\section{Introduction}
+
+\subsection{The endpoint problem}
+Let $u$ be a smooth solution of the incompressible Navier--Stokes equations
+\begin{equation}\label{eq:NS}
+\partial_t u+u\cdot\nabla u+\nabla p=\nu\Delta u,\qquad \Div u=0,
+\end{equation}
+on $\R^3\times(-\infty,0]$, with $u$ bounded and ancient (defined for all
+$t\le0$). Write $x=(\rho\cos\theta,\rho\sin\theta,\zeta)$, $\rho\ge0$,
+$\zeta\in\R$, for cylindrical coordinates, and assume axisymmetry: all fields
+are independent of $\theta$, $u=u^\rho e_\rho+u^\theta e_\theta+u^\zeta e_\zeta$.
+The swirl and the stream function are
+\begin{equation}
+\Gamma:=\rho\,u^\theta,\qquad
+b^\rho=-\frac{\psi_\zeta}{\rho},\quad b^\zeta=\frac{\psi_\rho}{\rho},
+\end{equation}
+so that the meridional velocity $b=(b^\rho,b^\zeta)$ is the poloidal part of
+$u$. We write $\omega=\nabla\times u$, and note
+\begin{equation}\label{eq:identities}
+\omega^\rho=-\partial_\zeta u^\theta,\qquad
+\omega^\zeta=\frac{1}{\rho}\partial_\rho(\rho u^\theta)=\frac{\Gamma_\rho}{\rho},
+\qquad \omega^\theta=-\frac{\Delta_\mu\psi}{\rho},
+\end{equation}
+where
+\begin{equation}\label{eq:Dmu}
+\Delta_\mu:=\partial_\rho^2-\frac1\rho\partial_\rho+\partial_\zeta^2 .
+\end{equation}
+
+Following the scaling-critical formulation of
+Koch--Nadirashvili--Seregin--\v{S}ver\'ak \cite{KNSS}, put
+\begin{equation}\label{eq:R}
+R=R(x,t):=1+|x|+\sqrt{-t},
+\end{equation}
+and fix the exponent $\gamma=0$.
+
+\begin{hypothesis}[$(H_1)$--$(H_4)$ at $\gamma=0$]\label{hyp:main}
+There are constants $C_0,\dots,C_3$ such that, for all $x\in\R^3$ and
+$t\le0$,
+\begin{enumerate}
+\item[(H1)] $|u(x,t)|\le C_0$;
+\item[(H2)] $|\omega(x,t)|\le C_1R(x,t)^{-1}$;
+\item[(H3)] $|\Gamma(x,t)|\le C_2$;
+\item[(H4)] $p(x,t)\ge-C_3$.
+\end{enumerate}
+\end{hypothesis}
+We also use the axis regularity that is automatic for smooth axisymmetric
+fields: near $\rho=0$,
+\begin{equation}\label{eq:axis}
+u^\theta=O(\rho),\qquad \Gamma=O(\rho^2),\qquad b^\rho=O(\rho).
+\end{equation}
+
+The problem is to prove that $u=(0,0,c)$ for some constant $c$. The relevant
+known theorem is the following.
+
+\begin{theorem}[swirl-free case; {\cite[Theorem~5.2]{KNSS}}]\label{thm:KNSS}
+Let $u=(u^\rho,0,u^\zeta)$ be a bounded ancient axisymmetric weak solution of
+\eqref{eq:NS}. Then $u=(0,0,b(t))$ for a bounded measurable $b$, and $b$ is
+constant (\cite[Remark~6.1]{KNSS}; in the present setting constancy also
+follows from $(H_4)$).
+\end{theorem}
+The proof in \cite{KNSS} uses only boundedness of $u$: the a priori bounds
+$|\nabla^k_xu|\le C_k$ for bounded ancient solutions (\cite[Section~4]{KNSS})
+make $\omega^\theta/\rho$ bounded, and this quantity satisfies the
+potential-free equation \cite[eq.~(5.16)]{KNSS} on $\R^5$, to which their
+maximum-principle lemma is applied.
+
+Thus the endpoint at $\gamma=0$ is \emph{equivalent} to the vanishing of the
+swirl, and the whole difficulty is concentrated in $\Gamma$. The exponent
+$\gamma=0$ is the critical one: for $\gamma<0$ (decay at infinity) the Liouville
+theorem is classical, while for $\gamma\ge1$ the statement is false --- the
+rigid rotation $u=(x_2,-x_1,0)$, $p=\tfrac12(x_1^2+x_2^2)$, is an
+axisymmetric steady solution with $|u|\lesssim R$. The case $\gamma=0$, i.e.\
+bounded velocity, is open in the
+presence of swirl (KNSS settle it only under the much stronger decay
+$|u|\lesssim1/\rho$, \cite[Theorem~5.3]{KNSS}); \cite[Section~5]{KNSS} state
+this explicitly, and the survey \cite{PZ} calls non-decaying $\Gamma$ the remaining
+hard case. Bounded $\Gamma$ has been settled under additional structure:
+$\Gamma\in L^\infty_tL^p_x$ with $p<\infty$ \cite{LZZ}, periodicity in $x_3$
+\cite{LRZperiodic}, and a rate at which the supremum of $\Gamma$ is approached
+\cite{LRZrate}. The present paper does not close the general case. It proves a
+sharp conditional theorem, shows that the sign hypothesis cannot be weakened
+within the radial-power family and that the weight/$h$-transform reformulation
+$(\star)$ does not by itself supply it, and identifies what remains.
+
+\subsection{Main results}
+Our first and central result is a maximum principle for a lifted variable.
+
+\begin{theorem}[conditional Liouville theorem]\label{thm:main}
+Let $u$ be as in \cref{hyp:main} and \eqref{eq:axis}. Assume in addition
+\begin{equation}\label{eq:Hsign}
+b^\rho(\rho,\zeta,t)\ge0\qquad\text{for all }(\rho,\zeta,t).
+\end{equation}
+Then $\Gamma\equiv0$, and consequently $u=(0,0,c)$.
+\end{theorem}
+
+The proof rests on the lift $\Phi=\Gamma/\rho^2$ to $\R^5$: the axis
+singularity disappears, and $\Phi$ satisfies the divergence-form equation
+$\partial_t\Phi+\Div_5(b\Phi)=\nu\Delta_5\Phi$. Under \eqref{eq:Hsign} the
+zero-order coefficient $V_0=\Div_5 b=2b^\rho/\rho$ of the equivalent
+non-divergence form is non-negative, and a Feynman--Kac (equivalently,
+maximum-principle) argument gives that $\sup|\Phi|$ is non-increasing forward
+in time; since $|\Phi|\to0$ uniformly as $t\to-\infty$, $\Phi\equiv0$.
+The device $\Delta_5$ and $\R^5$ is due to \cite{KNSS}, and the transport
+equation for $\Gamma$ is also theirs (\cite[eq.~(5.12)]{KNSS}). What is used
+here is the combination: applying the $\R^5$ device to the \emph{transported}
+swirl $\Gamma$ rather than to the vorticity $\omega^\theta$, whose equation
+\cite[eq.~(5.16)]{KNSS} is potential-free. Because $\Gamma=\rho^2\Phi$ carries
+the density factor $\rho^2$, the lift of $\Gamma$ necessarily acquires the
+zero-order term $V_0=\Div_5b=2b^\rho/\rho$; this term is absent in the
+vorticity formulation, and it is precisely the obstruction studied in this
+paper. The validity of \cref{thm:KNSS} without the no-swirl assumption is
+recorded as open in \cite{KNSS}.
+
+Our second result shows that the sign hypothesis is not an artefact of the
+choice of $\Phi$.
+
+\begin{theorem}[sharp weight trade-off]\label{thm:weights}
+Let $h>0$ be $C^2$ on $\{\rho>0\}$ and put $w=\Gamma/h$. At every critical
+point of $w$,
+\begin{equation}\label{eq:weight}
+\partial_t w=\nu\Delta_\mu w+\frac{w}{h}\bigl(\nu\Delta_\mu h-b\cdot\nabla h\bigr).
+\end{equation}
+If $\nu\Delta_\mu h\le b\cdot\nabla h$ everywhere, then $|w|$ cannot increase
+forward in time at any interior extremum; if moreover $\sup|w|$ is finite and
+attained for almost every $t$ (see \cref{rem:attain} for the general case),
+then $\sup|w|$ is non-increasing forward in time, and if in addition
+$\sup|\Gamma|/h\to0$ uniformly as $t\to-\infty$, then $\Gamma\equiv0$. For the
+radial powers $h=\rho^a$,
+the hypothesis is $b^\rho\ge\nu(a-2)/\rho$, and the backward decay
+$\sup_\rho\rho^2/\rho^a<\infty$ forces $a\ge2$ while the threshold being
+weaker than $b^\rho\ge0$ forces $a\le2$. Hence $a=2$ is the only admissible
+power, and its threshold is exactly $b^\rho\ge0$.
+\end{theorem}
+
+Thus the theorem above is the sharp member of a one-parameter family: no
+radial power weight can weaken the sign hypothesis.
+
+Our third result eliminates the remaining degrees of freedom in the weight,
+and exhibits the residual condition.
+
+\begin{theorem}[residual sufficient condition]\label{thm:star}
+Let $f\in C^2(\R^5)$ satisfy
+\begin{equation}\label{eq:star}
+f\ge-C,\qquad |\nabla_5f|\le C,\qquad
+\nu\bigl(\Delta_5f+|\nabla_5f|^2\bigr)-b\cdot\nabla_5f\le V_0:=\frac{2b^\rho}{\rho}.
+\end{equation}
+Then $\Gamma\equiv0$ for the ancient flow. Equivalently, with
+$\kappa=e^f$, if there is a positive supersolution $\kappa\ge c>0$,
+$|\nabla\log\kappa|\le C$, of the operator
+$\nu\Delta_5-\Div_5(b\,\cdot)=\nu\Delta_5-b\cdot\nabla_5-V_0$ of the lifted
+equation (the diffusion generator plus the zero-order term $-V_0$),
+\begin{equation}\label{eq:kappa}
+\nu\Delta_5\kappa\le\Div_5(b\kappa),
+\end{equation}
+then $\Gamma\equiv0$.
+\end{theorem}
+
+Condition $(\star)$ (i.e.\ the existence of $f$ in \eqref{eq:star}) is
+scale-free: it does not mention $t$, the plateau scale, or any blow-down.
+It is thus a time-independent sufficient condition for the remaining case;
+necessity is not claimed.
+We complement \cref{thm:star} with necessary conditions and with negative
+results for the weight method. They do not by themselves prove that $(\star)$
+fails in the Navier--Stokes class; they show that an automatic
+maximum-principle, weight, or $h$-transform argument cannot be expected to
+supply it (and, in the constant-coefficient model, that it does fail there),
+so that any proof of the endpoint must use the momentum--swirl coupling of the
+same solution.
+
+\begin{proposition}[invariant-mean obstruction]\label{prop:NC}
+Suppose $(\star)$ holds. If $m>0$ solves the stationary adjoint equation
+\begin{equation}\label{eq:adjoint}
+\nu\Delta_5m+\Div_5(bm)=0
+\end{equation}
+on $\R^5$, and the integrations by parts below are justified (for instance
+$f$ compactly supported, or a periodic or Neumann geometry), then
+\begin{equation}\label{eq:NCm}
+\nu\int_{\R^5}|\nabla_5f|^2\,m\le\int_{\R^5}V_0\,m .
+\end{equation}
+In particular, whenever $V_0$ has a strictly negative $m$-mean, $(\star)$ is
+impossible. (For the drift of the Navier--Stokes class, $V_0=\Div_5b$, that
+alternative is never taken \emph{whenever such an $m$ exists and the
+integrations by parts are justified}: the $m$-mean of $V_0$ equals a Fisher
+information and is non-negative, see \cref{rem:fisher}. A separate sufficient
+condition, using a different density, is \cref{prop:dual} below.)
+\end{proposition}
+
+\begin{proposition}[abstract counterexample; the mode]\label{prop:mode}
+Consider the linear equation with the drift $b$ and the zero-order coefficient
+$V_0$ treated as \emph{independent} data. Let $b=(0,0,\beta)$ be constant with
+$\beta\in\R$ and let $V_0<0$ be a constant. Then for every $k$ with
+$\nu k^2\le -V_0$ the function
+\begin{equation}\label{eq:mode}
+\Phi(t,\zeta)=e^{ik\zeta+\lambda t},\qquad
+\lambda=-\nu k^2-V_0-i\beta k,\quad \operatorname{Re}\lambda=-\nu k^2-V_0\ge0,
+\end{equation}
+is a bounded, non-constant, ancient solution.
+No such mode is compatible with $(H_1)$--$(H_3)$. Indeed, in the
+Navier--Stokes class $V_0=\Div_5b$; a constant $V_0\ne0$ then forces
+$b^\rho=\tfrac12V_0\rho$, and incompressibility
+$\partial_\rho b^\rho+b^\rho/\rho+\partial_\zeta b^\zeta=0$ forces
+$\partial_\zeta b^\zeta=-V_0$, i.e.\
+$b^\zeta=-V_0\zeta+\mathrm{const}$, which violates $(H_1)$. Moreover
+$\Phi$ is independent of $y\in\R^4$, so $\Gamma=\rho^2\Phi$ violates $(H_3)$.
+\end{proposition}
+
+Finally, the axisymmetric structure does supply one piece of information that
+the abstract linear class does not see.
+
+\begin{proposition}[the potential is a $\zeta$-derivative]\label{prop:W}
+Under $(H_1)$--$(H_3)$ and \eqref{eq:axis}, the function
+\begin{equation}\label{eq:W}
+W:=-\frac{2\psi}{\rho^2}
+\end{equation}
+satisfies $|W|\le C_0$ and
+\begin{equation}\label{eq:V0dz}
+V_0=\frac{2b^\rho}{\rho}=\partial_\zeta W .
+\end{equation}
+Consequently $V_0$ has zero Ces\`aro mean in $\zeta$ at every fixed $\rho$.
+This structure is not available in the independent-data abstract linear class
+of \cref{prop:mode}.
+\end{proposition}
+
+\subsection{What remains, and what is not claimed}
+The residual obstruction is the escaping plateau: if
+$L:=\lim_{t\to-\infty}\|\Gamma(t)\|_\infty>0$, then $|\Gamma|\ge L/2$ along a
+sequence of points with $\rho\gtrsim(-t)^{1/4}$, and no pointwise consequence
+of $(H_1)$--$(H_3)$ can exclude this
+(\cref{prop:plateau,prop:witness}). The programme therefore reduces to
+$(\star)$: the existence of $f$ in \eqref{eq:star} is a sufficient condition
+for the endpoint, and it is the form in which we expect the plateau to be
+excluded. Heuristically the plateau's leading-order reduction is a
+two-dimensional steady advection--diffusion problem; in the companion paper
+\cite{companion} we prove the corresponding lemma in the decay class, prove
+the bounded class empty for shear velocity fields, zero-advection solutions,
+and the product ansatz $G=\varphi(\rho)h(\zeta)$ over a large class of
+profiles --- including the entire periodic product class for every positive
+nonconstant $2\pi$-periodic $h\in C^2(\R)$, with no hypothesis on its minima
+--- and exhibit a bounded non-admissible counterexample showing that weighted
+incompressibility is essential. We emphasise
+that
+\cref{thm:main} is conditional: hypothesis \eqref{eq:Hsign} is not known to
+follow from $(H_1)$--$(H_4)$. No unconditional $\gamma=0$ theorem, and no
+statement about the Millennium Prize problem, is made here.
+
+\section{The lift to $\R^5$ and the exact equation}
+
+\subsection{The lifted variable}
+Axis regularity \eqref{eq:axis} gives $\Gamma=\rho^2g(\rho^2,\zeta,t)$
+with $g$ smooth. Hence
+\begin{equation}\label{eq:Phi}
+\Phi:=\frac{\Gamma}{\rho^2}=g(|y|^2,y_5,t),\qquad y\in\R^4,\ y_5=\zeta,
+\end{equation}
+extends to a smooth $\mathrm{SO}(4)$-invariant function on
+$\R^5\times(-\infty,0]$, with $\rho=|y|$. The axis singularity is removed by
+the lift.
+
+\begin{proposition}[exact lifted equation]\label{prop:lift}
+Let $\Delta_5=\partial_\rho^2+3\rho^{-1}\partial_\rho+\partial_\zeta^2$ be the
+Euclidean Laplacian of $\R^5$ acting on $\mathrm{SO}(4)$-invariant functions,
+and let $b=b^\rho\,y/\rho+b^\zeta e_5$ be the meridional velocity lifted to
+$\R^5$. Then
+\begin{equation}\label{eq:liftidentity}
+\Delta_\mu(\rho^2A)=\rho^2\Delta_5A
+\end{equation}
+for every smooth $A$, and $\Phi$ satisfies
+\begin{equation}\label{eq:Phieq}
+\partial_t\Phi+\Div_5(b\Phi)=\nu\Delta_5\Phi,
+\end{equation}
+equivalently
+\begin{equation}\label{eq:Phieq2}
+\partial_t\Phi+b\cdot\nabla_5\Phi+V_0\Phi=\nu\Delta_5\Phi,\qquad
+V_0:=\Div_5b=\frac{2b^\rho}{\rho}.
+\end{equation}
+\end{proposition}
+\begin{proof}
+The identity \eqref{eq:liftidentity} is the radial $(4+1)$-dimensional
+identity: for $A=A(\rho,\zeta)$, $\rho^2\Delta_5A$ equals
+$\Delta_\mu(\rho^2A)$ by direct differentiation. For the equation, the swirl
+equation reads
+\begin{equation}
+\partial_t u^\theta+b\cdot\nabla u^\theta+\frac{b^\rho u^\theta}{\rho}
+=\nu\Bigl(\Delta u^\theta-\frac{u^\theta}{\rho^2}\Bigr),
+\end{equation}
+and multiplication by $\rho$ gives
+$\partial_t\Gamma+b\cdot\nabla\Gamma=\nu\Delta_\mu\Gamma$, as one checks
+from \eqref{eq:Dmu}. Dividing by $\rho^2$ and using \eqref{eq:liftidentity}
+yields \eqref{eq:Phieq}. For the divergence, $3$D incompressibility gives
+\begin{equation}
+\Div_5b=\partial_\rho b^\rho+3\frac{b^\rho}{\rho}+\partial_\zeta b^\zeta
+=\Bigl(\partial_\rho b^\rho+\frac{b^\rho}{\rho}+\partial_\zeta b^\zeta\Bigr)
++\frac{2b^\rho}{\rho}=\frac{2b^\rho}{\rho}.
+\end{equation}
+\end{proof}
+
+\begin{proposition}[uniform backward bound]\label{prop:bound}
+Under $(H_1)$--$(H_3)$ and \eqref{eq:axis}, with $R$ as in
+\eqref{eq:R},
+\begin{equation}\label{eq:bound}
+|\Phi(t,\rho,\zeta)|\le\frac{C_1}{2\,(1+\sqrt{-t})}
+\qquad\text{for all }\rho,\zeta,t\le0 .
+\end{equation}
+In particular $\|\Phi(t)\|_\infty\to0$ as $t\to-\infty$.
+\end{proposition}
+\begin{proof}
+By \eqref{eq:identities}, $\partial_\rho\Gamma=\rho\,\omega^\zeta$, so
+$|\partial_\rho\Gamma|\le\rho|\omega|\le C_1\rho/R$. Since
+$\Gamma(0,\zeta,t)=0$ by \eqref{eq:axis},
+\begin{equation}
+|\Gamma(t,\rho,\zeta)|\le\int_0^\rho\frac{C_1\rho'}{R}\dd\rho'
+\le\frac{C_1\rho^2}{2\,(1+\sqrt{-t})},
+\end{equation}
+because $R\ge1+\sqrt{-t}$. Divide by $\rho^2$.
+\end{proof}
+
+We shall use only that $b$ is bounded, which is $(H_1)$, and that the diffusion
+below is non-degenerate. No regularity beyond boundedness is required: the
+Feynman--Kac step is formulated for solutions of the martingale problem, which
+is well posed for bounded measurable drift.
+
+\begin{remark}[why no regularity of $b$ is needed]\label{rem:noreg}
+Let $X$ be a solution of the martingale problem for the generator
+$\mathcal L=\nu\Delta_5-b\cdot\nabla_5$ started at $x$. Since $b$ is bounded
+and the second-order part is uniformly elliptic, the martingale problem is
+well posed (Stroock--Varadhan). For $\Phi\in C^2$, It\^o's formula in
+martingale form applies, so no Lipschitz assumption on $b$, and no flow of
+diffeomorphisms, is required.
+\end{remark}
+
+\section{The conditional Liouville theorem}
+
+\begin{theorem}[restatement of \cref{thm:main}]\label{thm:main2}
+Let $u$ satisfy \cref{hyp:main} and \eqref{eq:axis}, and assume
+\eqref{eq:Hsign}. Then $\Phi\equiv0$, hence $\Gamma\equiv0$, hence
+$u=(0,0,c)$.
+\end{theorem}
+\begin{proof}
+By \eqref{eq:Hsign}, $V_0=2b^\rho/\rho\ge0$ everywhere. By $(H_1)$, $b$ is
+bounded, so by \cref{rem:noreg} the martingale problem below is well posed and
+It\^o's formula applies to the $C^2$ function $\Phi$. Fix
+$x$ and let $X$ be the solution of the martingale problem for the generator
+$\nu\Delta_5-b(t-\cdot)\cdot\nabla_5$ started at $x$, i.e.\ of
+\begin{equation}\label{eq:SDE}
+\dd X_r=\sqrt{2\nu}\,\dd W_r-b(t-r,X_r)\dd r,\qquad X_0=x,
+\end{equation}
+in the martingale-problem sense. Let
+$A_r=\int_0^rV_0(t-u,X_u)\dd u\ge0$. It\^o's formula applied to
+$e^{-A_r}\Phi(t-r,X_r)$, using \eqref{eq:Phieq2}, shows that
+$e^{-A_r}\Phi(t-r,X_r)$ is a bounded local martingale, hence a true
+martingale. Taking expectations at $r=t-s$ for $s<t$,
+\begin{equation}\label{eq:FK}
+\Phi(t,x)=\mathbb{E}\Bigl[e^{-\int_0^{t-s}V_0(t-u,X_u)\dd u}\,
+\Phi(s,X_{t-s})\Bigr].
+\end{equation}
+Since $V_0\ge0$, the exponential factor lies in $[0,1]$, whence
+\begin{equation}
+|\Phi(t,x)|\le\|\Phi(s)\|_\infty
+\qquad\text{for all }x\text{ and all }s<t .
+\end{equation}
+Therefore $M(t):=\|\Phi(t)\|_\infty\le M(s)$ for $s<t$. Letting
+$s\to-\infty$ and using \cref{prop:bound}, $M(t)\le\lim_{s\to-\infty}M(s)=0$.
+Hence $\Phi\equiv0$, so $\Gamma\equiv0$. The flow is swirl-free, and
+\cref{thm:KNSS} gives $u=(0,0,b(t))$; $(H_4)$ with the pressure bounded below
+for all $\zeta$ forces $b'=0$, so $b=c$ is constant.
+\end{proof}
+
+\begin{remark}[maximum-principle form]
+The Feynman--Kac step can be replaced by the classical maximum principle.
+Under \eqref{eq:Hsign}, at an interior spatial maximum of $\Phi$ one has
+$\nabla_5\Phi=0$, $\Delta_5\Phi\le0$, hence
+$\partial_t\Phi=-V_0\Phi+\nu\Delta_5\Phi\le0$ whenever $\Phi\ge0$; at an
+interior minimum with $\Phi\le0$, $\partial_t\Phi\ge0$. Thus $\sup\Phi$ is
+non-increasing and $\inf\Phi$ is non-decreasing, so $M(t)$ is non-increasing.
+The Feynman--Kac formulation is cleaner because it requires no attainment of
+the supremum on the unbounded domain $\R^5$.
+\end{remark}
+
+\begin{remark}[where the sign is actually needed]
+The maximum-principle form of the proof uses $V_0\ge0$ only at the points
+where $|\Phi|$ is (nearly) maximal; the Feynman--Kac form uses it along the
+backward paths from those points. In either case the hypothesis is required
+only where $|\Phi|$ is large, and those points are the escaping plateau of
+\cref{prop:plateau}. This is why the obstruction is localised at
+$\rho\sim(-t)^{1/4}$ rather than spread over space. We do not know whether
+$b^\rho\ge0$ on that set follows from $(H_1)$--$(H_4)$.
+\end{remark}
+
+\begin{remark}[the potential-free case is not the issue]\label{rem:sssz}
+For the potential-free equation $\partial_t\Phi+b\cdot\nabla_5\Phi=\nu\Delta_5\Phi$
+with bounded divergence-free $b$ the Liouville property for bounded ancient
+solutions is known for drifts in a scale-invariant class: \cite{SSSZ} prove it
+for $b\in L_\infty(BMO^{-1})$. That class does not contain every bounded
+divergence-free drift (a non-zero constant is not in $BMO^{-1}$), and we do not
+verify it for the poloidal drift here. In the present setting, however, the
+case $V_0\equiv0$ is elementary: $(H_2)$ supplies the uniform backward decay
+\eqref{eq:bound}, and \cref{thm:main2} applies with $V_0\equiv0$. Hence the
+whole obstruction is the zero-order term
+$V_0=2b^\rho/\rho$; the question is whether its sign can be replaced by
+structure.
+\end{remark}
+
+\begin{remark}[sharpness in the abstract class]
+\Cref{prop:mode} shows that the hypothesis $V_0\ge0$ cannot be dropped in the
+abstract linear class: for a negative constant potential there are bounded
+ancient non-constant solutions. (For a general bounded sign-indefinite
+potential this is plausible but is not proved here; the mode ansatz handles
+constant $V_0$.) Thus \cref{thm:main2} is not a statement about the linear
+equation; it uses the sign, or equivalently the same-solution structure that
+would supply it.
+\end{remark}
+
+\section{The weight family and its sharpness}
+
+\begin{theorem}[restatement of \cref{thm:weights}]\label{thm:weights2}
+Let $h>0$ be $C^2$ on $\{\rho>0\}$ and $w=\Gamma/h$. At every point where
+$\nabla w=0$,
+\begin{equation}\label{eq:weight2}
+\partial_t w=\nu\Delta_\mu w+\frac{w}{h}\bigl(\nu\Delta_\mu h-b\cdot\nabla h\bigr).
+\end{equation}
+If $\nu\Delta_\mu h\le b\cdot\nabla h$ on $\{\rho>0\}$, then $|w|$ cannot
+increase forward in time at any interior extremum. If moreover $\sup|w|$ is
+finite and attained for almost every $t$, then $\sup|w|$ is non-increasing
+forward in time; if in addition $\sup|\Gamma|/h\to0$ uniformly as
+$t\to-\infty$, then $w\equiv0$ and $\Gamma\equiv0$.
+\end{theorem}
+\begin{proof}
+Since $\Gamma=wh$ and $\nabla w=0$, we have $\nabla\Gamma=w\nabla h$ and,
+by the product rule for $\Delta_\mu$,
+$\Delta_\mu\Gamma=h\Delta_\mu w+w\Delta_\mu h$. Also
+$b\cdot\nabla\Gamma=wb\cdot\nabla h$. Substituting into
+$\partial_t\Gamma+b\cdot\nabla\Gamma=\nu\Delta_\mu\Gamma$ and dividing by
+$h$ gives \eqref{eq:weight2}. At a positive maximum of $w$, $\Delta_\mu w\le0$
+and $\nu\Delta_\mu h-b\cdot\nabla h\le0$, so $\partial_tw\le0$; at a negative
+minimum, $\Delta_\mu w\ge0$ and $w(\nu\Delta_\mu h-b\cdot\nabla h)/h\ge0$, so
+$\partial_tw\ge0$. In either case $|w|$ cannot increase. The concluding
+implication is the usual two-sided argument.
+\end{proof}
+
+\begin{remark}[on attainment at spatial infinity]\label{rem:attain}
+The extremal-point argument is applied where $|w|$ attains its supremum. If the
+supremum is not attained at a finite point, one argues on the parabolic cylinder
+$[s,t]\times\{|y|<S\}$ and lets $S\to\infty$; the term on $\{|y|=S\}$ must then be
+controlled, and in general that requires information at spatial infinity. In this
+paper \cref{thm:weights2} is used only to organise the family of weights. The two
+conclusions we actually need --- for $h=\rho^2$ and for
+$h=\rho^2e^{f}$ with $f\ge-C$, $|\nabla_5f|\le C$ --- are proved with no
+attainment hypothesis at all, by the Feynman--Kac representation in the proof of
+\cref{thm:main2} (for $h=\rho^2$) and \cref{thm:star2} (for
+$h=\rho^2e^f$), where the transformed drift is bounded and the zero-order term
+has the correct sign.
+\end{remark}
+
+\begin{corollary}[sharp trade-off]\label{cor:tradeoff}
+For $h=\rho^a$, $a>0$,
+\begin{equation}
+\Delta_\mu\rho^a=a(a-2)\rho^{a-2},\qquad
+b\cdot\nabla\rho^a=a\rho^{a-1}b^\rho,
+\end{equation}
+so the hypothesis of \cref{thm:weights2} is
+$b^\rho\ge\nu(a-2)/\rho$. The requirement of uniform backward decay,
+$\sup_{\rho>0}\rho^2/\rho^a<\infty$, is equivalent to $a\ge2$; the
+requirement that the threshold be weaker than $b^\rho\ge0$, i.e.\
+$\nu(a-2)/\rho\le0$, is equivalent to $a\le2$. Both hold only at $a=2$.
+Equivalently, the differential inequality $h''\le h'/\rho$ forces
+$h\le C\rho^2$, while uniform decay forces $h\ge c\rho^2$; hence
+\emph{no radial power weight can weaken the sign hypothesis}.
+\end{corollary}
+
+The three special cases recover, in one family, three previously separate
+facts: $h=\rho^2$ (\cref{thm:main2}); $h=\rho$ with threshold
+$b^\rho\ge-\nu/\rho$; and $h=\rho^a$ with the general threshold above.
+In particular, the choice $h=\rho^2$ in \cref{thm:main2} is forced by the
+requirement of backward decay, not selected for convenience.
+
+\section{The residual condition}
+
+\subsection{A general weight and the condition $(\star)$}
+Write $h=\rho^2e^f$ with $f=f(\rho,\zeta)\in C^2$ $\mathrm{SO}(4)$-invariant.
+By \eqref{eq:liftidentity},
+$\Delta_\mu h=\rho^2e^f(\Delta_5f+|\nabla_5f|^2)$ and
+$b\cdot\nabla h=e^f(2\rho b^\rho+\rho^2b\cdot\nabla_5f)$. Hence the
+hypothesis of \cref{thm:weights2} is exactly
+\begin{equation}\label{eq:star2}
+\nu\bigl(\Delta_5f+|\nabla_5f|^2\bigr)-b\cdot\nabla_5f\le\frac{2b^\rho}{\rho}.
+\end{equation}
+Moreover $|\Gamma|/h=|\Phi|e^{-f}$, which is bounded and uniformly
+backward-decreasing whenever $f\ge-C$. (The identification with the weight
+hypothesis of \cref{thm:weights2} uses that $f$ is $\mathrm{SO}(4)$-invariant;
+the $5$D transformation below, and hence \cref{thm:star2}, apply to a general
+$f\in C^2(\R^5)$.)
+
+\begin{theorem}[restatement of \cref{thm:star}]\label{thm:star2}
+Let $f\in C^2(\R^5)$ satisfy \eqref{eq:star2}, $f\ge-C$ and
+$|\nabla_5f|\le C$. Then $\Gamma\equiv0$; equivalently, if $\kappa=e^f$
+satisfies \eqref{eq:kappa} together with $\kappa\ge c>0$ and
+$|\nabla\log\kappa|\le C$, then $\Gamma\equiv0$.
+\end{theorem}
+\begin{proof}
+Write $h=\rho^2e^{f}$, $w=\Gamma/h=\Phi e^{-f}$ and $\Psi:=\Phi e^{-f}$. The
+computation in the remark below shows that $\Psi$ satisfies \eqref{eq:Psieq},
+a linear equation whose drift $b-2\nu\nabla_5f$ is bounded (because
+$|\nabla_5f|\le C$) and whose zero-order coefficient is $-G_\kappa\le0$ ---
+this is exactly \eqref{eq:star2}. As in the proof of \cref{thm:main2}, the
+Feynman--Kac representation for bounded solutions of \eqref{eq:Psieq} gives,
+for $s<t$ and all $x$,
+\begin{equation}
+|\Psi(t,x)|\le\|\Psi(s)\|_\infty\le e^{C}\|\Phi(s)\|_\infty\to0
+\qquad(s\to-\infty),
+\end{equation}
+where we used $f\ge-C$ and \cref{prop:bound}. Hence $\Psi\equiv0$, so
+$\Gamma\equiv0$. The $\kappa$-form is the same statement with $\kappa=e^f$.
+\end{proof}
+
+\begin{remark}[the $h$-transform form]
+With $\kappa=e^f$, \eqref{eq:star2} is
+$\nu\Delta_5\kappa\le\Div_5(b\kappa)$. The transformation
+$\Phi=\kappa\Psi$ is the classical Doob $h$-transform of the ground-state
+theory of second-order elliptic operators \cite{Doob,Pinsky}: one computes
+\begin{equation}
+\partial_t\Phi+\Div_5(b\Phi)-\nu\Delta_5\Phi
+=\kappa\Bigl[\partial_t\Psi+(b-2\nu\nabla_5\log\kappa)\cdot\nabla_5\Psi
+-\nu\Delta_5\Psi\Bigr]+\Psi\bigl[\Div_5(b\kappa)-\nu\Delta_5\kappa\bigr].
+\end{equation}
+Since $\nabla_5\log\kappa=\nabla_5f$ is bounded, the transformed drift
+$b-2\nu\nabla_5f$ is bounded. Dividing the bracket by $\kappa$ gives
+\begin{equation}\label{eq:Psieq}
+\begin{split}
+\partial_t\Psi+(b-2\nu\nabla_5f)\cdot\nabla_5\Psi&=\nu\Delta_5\Psi-G_\kappa\Psi,\\
+G_\kappa:=\frac{\Div_5(b\kappa)-\nu\Delta_5\kappa}{\kappa}
+&=V_0+b\cdot\nabla_5f-\nu\bigl(\Delta_5f+|\nabla_5f|^2\bigr)\ge0,
+\end{split}
+\end{equation}
+where the inequality is exactly \eqref{eq:star2}. At an interior spatial
+maximum of $\Psi>0$ one has $\Delta_5\Psi\le0$ and $-G_\kappa\Psi\le0$, so
+$\partial_t\Psi\le0$; at an interior minimum with $\Psi<0$ one has
+$\Delta_5\Psi\ge0$ and $-G_\kappa\Psi\ge0$, so $\partial_t\Psi\ge0$. Hence
+$\sup|\Psi|$ is non-increasing forward in time. Finally
+$|\Psi|=|\Phi|e^{-f}\le e^{C}|\Phi|\to0$ uniformly as $t\to-\infty$ by
+\cref{prop:bound}, so $\Psi\equiv0$ and $\Gamma\equiv0$.
+\end{remark}
+
+\begin{remark}[precision on $(\star)$]
+Three points, all elementary. (i) Only $f\ge-C$ and $|\nabla_5f|\le C$ are
+needed; $f$ may grow at infinity. (ii) $\kappa$ is taken independent of $t$.
+If $\kappa=\kappa(t)$ depends on $t$ only, the equation
+$\Div_5(b\kappa)=\nu\Delta_5\kappa$ reduces to $\kappa\operatorname{div}_5b=0$,
+i.e.\ $V_0\equiv0$, which is the potential-free case of \cref{rem:sssz}. For a
+general $\kappa(t,x)$ the transformed equation \eqref{eq:Psieq} acquires the
+extra zero-order term $\partial_t\log\kappa$, which two-sided bounds on
+$\kappa$ alone do not control; we do not claim that case. (iii) The
+Feynman--Kac representation used in the proof is the rigorous route: it needs
+no attainment hypothesis for the maximum principle. No upper bound on
+$\kappa$ is needed in the time-independent case.
+\end{remark}
+
+\begin{proposition}[time-dependent weights of additive type give nothing new]
+\label{prop:timedep}
+Let $f=f(\rho,\zeta,t)$ be $\mathrm{SO}(4)$-invariant and $h=\rho^2e^{f(t,x)}$,
+and put $w=\Gamma/h$. Then at every critical point of $w$,
+\begin{equation}\label{eq:G}
+\partial_tw=\nu\Delta_\mu w+Gw,
+\qquad
+G=\nu\bigl(\Delta_5f+|\nabla_5f|^2\bigr)-b\cdot\nabla_5f-\frac{2b^\rho}{\rho}-\partial_tf,
+\end{equation}
+so the amplitude is non-increasing only if $G\le0$, i.e.\
+$\partial_tf\ge\mathcal R(x)$ with
+$\mathcal R=\nu(\Delta_5f+|\nabla_5f|^2)-b\cdot\nabla_5f-2b^\rho/\rho$.
+With $f=\psi(x)+c(t)$ this reads $c'(t)\ge\sup_x\mathcal R(x)$; backward decay
+of $w=\Phi e^{-f}$ forces $c'\le0$; hence $\sup_x\mathcal R\le0$, which is
+exactly \eqref{eq:star2}. Thus, within the additive family, letting $h$
+depend on $t$ gives no improvement. For a general $f(t,x)$ the only new term
+is $\partial_tf$, and controlling it requires a bound on $\partial_t\log\kappa$
+that spatial hypotheses do not supply; we do not claim that case.
+\end{proposition}
+\begin{proof}
+Direct computation. Since $\Gamma=wh$ and $\partial_th=h\partial_tf$, the
+argument of \cref{thm:weights2} gives, at a critical point,
+\begin{equation}
+h\partial_tw+w\,h\,\partial_tf=\nu\bigl(h\Delta_\mu w+w\Delta_\mu h\bigr)-w\,b\cdot\nabla h,
+\end{equation}
+i.e.\ $\partial_tw=\nu\Delta_\mu w+(w/h)(\nu\Delta_\mu h-b\cdot\nabla h)-w\partial_tf$.
+Dividing the bracket by $h$ using \eqref{eq:star2} gives \eqref{eq:G}. The
+sign of $G$ is fixed by the case $f=0$, where $G=-V_0$: non-increase is then
+$G\le0$, i.e.\ $V_0\ge0$, which is \cref{thm:main2}.
+\end{proof}
+
+\subsection{Why the weight and averaged tests cannot remove the sign}
+\begin{proof}[Proof of \cref{prop:NC}]
+Multiply \eqref{eq:star2} by $m>0$ and integrate. Using
+\begin{equation}
+\int(\Delta_5f)m=\int f\Delta_5m,\qquad
+\int(b\cdot\nabla_5f)m=-\int f\,\Div_5(bm)
+\end{equation}
+(all boundary terms being discarded), we obtain
+\begin{equation}
+\int f\bigl(\nu\Delta_5m+\Div_5(bm)\bigr)+\nu\int|\nabla_5f|^2m
+\le\int V_0\,m .
+\end{equation}
+On the zero set of \eqref{eq:adjoint} the first term vanishes and
+\eqref{eq:NCm} follows.
+\end{proof}
+
+\begin{proposition}[dual form: a stationary density bounded below suffices]
+\label{prop:dual}
+Let $n>0$ be $C^2$ on $\R^5$ and satisfy the stationary Fokker--Planck
+equation of the sign-reversed drift,
+\begin{equation}\label{eq:dual}
+\nu\Delta_5n=\Div_5(bn).
+\end{equation}
+If in addition $n\ge c>0$ and $|\nabla_5\log n|\le C$ on $\R^5$, then
+\eqref{eq:kappa} holds with $\kappa=n$, with equality; consequently
+$\Gamma\equiv0$ by \cref{thm:star}.
+\end{proposition}
+\begin{proof}
+\eqref{eq:dual} is \eqref{eq:kappa} with equality for $\kappa=n$; the two
+bounds are the remaining hypotheses of \cref{thm:star}.
+\end{proof}
+\begin{remark}
+The density in \cref{prop:dual} must solve \eqref{eq:dual}, not
+\eqref{eq:adjoint}: the two equations differ by the sign of $\Div_5(b\,\cdot)$,
+and $\kappa=n$ is the exact stationary solution of the operator in
+\eqref{eq:kappa} itself. In terms of the diffusions, $m$ of \eqref{eq:adjoint}
+is stationary for $\dd X=\sqrt{2\nu}\dd W-b\,\dd r$, while $n$ is stationary
+for $\dd X=\sqrt{2\nu}\dd W+b\,\dd r$. The drift $+b$ is the sign reversal of
+$-b$; it is \emph{not} the time reversal of the diffusion with drift $-b$ and
+invariant density $m$, whose drift is $+b+2\nu\nabla_5\log m$ (equal to $+b$
+only in the potential-free case $V_0\equiv0$).
+\end{remark}
+
+\begin{remark}[the invariant mean is the Fisher information]\label{rem:fisher}
+Let $m>0$ solve \eqref{eq:adjoint}, and suppose the integrations by parts below
+are justified (for instance a periodic or Neumann geometry, or $f$ compactly
+supported). On $\R^5$ this requires a separate flux hypothesis --- the fluxes
+of $bm$ and of $m\nabla_5\log m$ through $|x|=R$ must vanish --- which does not
+follow from local bounds and is not automatic for a bounded-below $m$; and
+then $\int m=\infty$, so \eqref{eq:fisher} is an identity between unnormalized
+integrals, for which one also needs $\int|\nabla_5m|^2/m<\infty$ and
+$\int|V_0|m<\infty$.
+Testing \eqref{eq:adjoint} against $\log m$ gives
+\begin{equation}
+\int b\cdot\nabla_5m=-\nu\int\frac{|\nabla_5m|^2}{m},
+\qquad\text{and}\qquad
+\int\Div_5(bm)=0 .
+\end{equation}
+Hence, in the Navier--Stokes class where $V_0=\Div_5b$,
+\begin{equation}\label{eq:fisher}
+\int V_0\,m=\int\Div_5(bm)-\int b\cdot\nabla_5m
+=\nu\int\frac{|\nabla_5m|^2}{m}\ \ge0 .
+\end{equation}
+Thus the ``in particular'' of \cref{prop:NC} cannot fire when $V_0=\Div_5b$:
+the $m$-mean of $V_0$ is never strictly negative, and \eqref{eq:NCm} becomes
+$\int|\nabla_5f|^2m\le\int|\nabla_5\log m|^2m$, an equality at $f=\log m$.
+The invariant-mean test therefore cannot exclude $(\star)$ on its own. For the
+density $n$ of \eqref{eq:dual} the same computation gives the opposite sign,
+\begin{equation}\label{eq:fisher2}
+\int V_0\,n=\int\Div_5(bn)-\int b\cdot\nabla_5n
+=-\nu\int\frac{|\nabla_5n|^2}{n}\ \le0 ,
+\end{equation}
+so the two orientations carry opposite means; there is no contradiction, since
+$m$ and $n$ are different densities, and for a flow with $V_0\not\equiv0$
+neither is known to exist on $\R^5$ (\cref{prop:radial} below rules out a
+radial $n$).
+One sufficient form of what $(\star)$ requires from the dual side is the lower
+bound of \cref{prop:dual}: a stationary density bounded below (the converse is
+not claimed). A normalizable density ($\int n<\infty$) cannot be bounded below
+on $\R^5$, so the dual route needs a non-integrable positive solution of
+\eqref{eq:dual}. The model class
+below has $V_0$ as an independent datum, not $\Div_5b$.
+\end{remark}
+
+The equation \eqref{eq:adjoint} is the stationary Fokker--Planck equation of
+the diffusion $\dd X=\sqrt{2\nu}\dd W-b\,\dd r$. When it has a positive
+solution $m$ bounded away from $0$ on a periodic or Neumann geometry (or $f$
+is compactly supported, so that the boundary terms in the integration by parts
+vanish), \eqref{eq:NCm} is a genuine necessary condition; by \cref{rem:fisher}
+it can never fail through the sign of $V_0$ when $V_0=\Div_5b$. On $\R^5$ with
+bounded drift the diffusion can be transient and no normalizable $m$ need
+exist, so \cref{prop:NC} is a model criterion rather than a theorem about the
+Navier--Stokes class.
+
+A second necessary condition needs no stationary density at all, only the
+bounds on $f$, and is therefore available on $\R^5$.
+
+\begin{proposition}[averaged necessary condition]\label{prop:ballavg}
+Assume $(H_1)$, so that $b$ and $V_0=2b^\rho/\rho$ are bounded. Let
+$f\in C^2(\R^5)$ satisfy \eqref{eq:star} with $|\nabla_5f|\le C$, and let
+$B_R\subset\R^5$ be the ball of radius $R$. Then
+\begin{equation}\label{eq:ballavg}
+\int_{B_R}\Bigl(V_0+\frac{|b|^2}{4\nu}\Bigr)\ge-\nu C\,|\partial B_R|,
+\end{equation}
+and consequently
+$\liminf_{R\to\infty}\frac{1}{|B_R|}\int_{B_R}\bigl(V_0+|b|^2/(4\nu)\bigr)\ge0$.
+\end{proposition}
+\begin{proof}
+Integrating \eqref{eq:star} over $B_R$ and using the divergence theorem,
+\begin{equation}
+\nu\int_{\partial B_R}\nabla_5f\cdot n+\nu\int_{B_R}|\nabla_5f|^2
+-\int_{B_R}b\cdot\nabla_5f\le\int_{B_R}V_0 .
+\end{equation}
+The boundary term is at most $\nu C|\partial B_R|$ in absolute value, and
+\begin{equation}
+\nu|\nabla_5f|^2-b\cdot\nabla_5f
+=\nu\Bigl|\nabla_5f-\frac{b}{2\nu}\Bigr|^2-\frac{|b|^2}{4\nu}
+\ge-\frac{|b|^2}{4\nu}.
+\end{equation}
+Dividing by $|B_R|\sim R^5$ and letting $R\to\infty$ gives the liminf.
+\end{proof}
+
+\begin{corollary}\label{cor:const}
+If $b$ and $V_0$ are constant and $V_0<-\dfrac{|b|^2}{4\nu}$, then $(\star)$
+fails.
+\end{corollary}
+\begin{proof}
+The average in \eqref{eq:ballavg} equals the negative constant
+$V_0+|b|^2/(4\nu)$ for every $R$, contradicting
+\cref{prop:ballavg} once $R$ is large.
+\end{proof}
+
+The dual route is rigid in the radial direction.
+
+\begin{proposition}[no radial dual density]\label{prop:radial}
+Let $n=n(\rho)\in C^2(0,\infty)$ satisfy \eqref{eq:dual}, and assume the class
+bounds $|b|\le C_0$ and \eqref{eq:axis}; choose the stream function with
+$\psi(0,\zeta)=0$, so that $|\psi|\le C_0\rho^2/2$.
+Then $n=B+C\rho^{-2}$ with $B\,b^\rho\equiv0$. Consequently an admissible $n$
+in the sense of \cref{prop:dual} is constant, and it exists only in the
+potential-free case $V_0\equiv0$.
+\end{proposition}
+\begin{proof}
+For $n=n(\rho)$, the incompressibility identity
+$\partial_\zeta b^\zeta=-\partial_\rho b^\rho-b^\rho/\rho$ gives
+$\Div_5(bn)=b^\rho n'+(2b^\rho/\rho)n$. Hence \eqref{eq:dual} is
+$\nu(n''+3n'/\rho)=b^\rho(n'+2n/\rho)$, and since $b^\rho=-\psi_\zeta/\rho$,
+\begin{equation}
+\nu\rho\Bigl(n''+\frac{3n'}{\rho}\Bigr)
+=-\partial_\zeta\Bigl[\psi\Bigl(n'+\frac{2n}{\rho}\Bigr)\Bigr].
+\end{equation}
+The left side is independent of $\zeta$, so $F:=\psi(n'+2n/\rho)$ satisfies
+$\partial_\zeta F=-G(\rho)$ with $G$ independent of $\zeta$. By
+$|\psi|\le C_0\rho^2/2$, $F$ is bounded in $\zeta$ at every fixed $\rho$;
+therefore $G=0$. Setting $p=n'+2n/\rho$, this reads
+$p'+p/\rho=0$, i.e.\ $(\rho p)'=0$, so $p=D/\rho$ and hence
+$(n\rho^2)'=D\rho$: $n=B+C\rho^{-2}$. Substituting back gives
+$n'+2n/\rho=2B/\rho$, hence $0=b^\rho\cdot2B/\rho$. If $n$ is admissible, then
+$C=0$ (either by $C^2$ at the axis or by $|\nabla_5\log n|\to\infty$ as
+$\rho\to0$ when $C\ne0$), so $n\equiv B>0$ and $0=\nu\Delta_5n=\Div_5(bn)=BV_0$,
+i.e.\ $V_0\equiv0$.
+\end{proof}
+
+In the Navier--Stokes class the divergence structure removes the sign
+information from both averaged tests: $V_0=\Div_5b$ is a divergence, so
+$\int_{B_R}V_0=\int_{\partial B_R}b\cdot n=O(R^4)$ is a boundary term, and
+\eqref{eq:ballavg} constrains only the size of $C$ (the gradient bound of the
+supersolution), not the sign of $V_0$. The tests are decisive in the
+constant-coefficient model, where $V_0$ is independent data and
+$\int_{B_R}V_0$ grows like $R^5$: \cref{cor:const}
+shows that $(\star)$ fails whenever $V_0<-|b|^2/(4\nu)$, while
+\cref{prop:mode} exhibits a nonzero bounded ancient solution of the linear
+equation for every constant $V_0<0$. (It is natural to expect that a localized
+negative well of $V_0$ also supports a bound state, but we do not prove this:
+the operator $\nu\Delta_5-b\cdot\nabla_5-V_0$ is not self-adjoint, and a
+negative value of the quadratic form of its symmetric part does not by itself
+produce an eigenfunction. The explicit mode of \cref{prop:mode} is the
+rigorous counterpart, and \cref{cor:const} the rigorous failure criterion.)
+Thus the weight/$h$-transform route cannot be expected to prove $(\star)$ for
+a sign-indefinite $V_0$; and in the Navier--Stokes class the averaged tests
+cannot even see the sign. Any proof must use more than the linear equation,
+namely the same-solution coupling that ties $b$ to $V_0=\Div_5b$.
+
+\begin{proof}[Proof of \cref{prop:mode}]
+With $b=(0,0,\beta)$ constant and $V_0$ constant, substitute
+$\Phi=e^{ik\zeta+\lambda t}$ into
+$\partial_t\Phi+b\cdot\nabla_5\Phi+V_0\Phi=\nu\Delta_5\Phi$. The advection term
+is $i\beta k\Phi$ and $\Delta_5\Phi=-k^2\Phi$, so
+$\lambda+i\beta k+V_0=-\nu k^2$, i.e.\ \eqref{eq:mode}. For
+$k^2\le-V_0/\nu$ one has $\operatorname{Re}\lambda\ge0$, so $\Phi$ is bounded
+on $t\le0$ and non-constant. The incompatibility statements are those of the
+statement above.
+\end{proof}
+
+\begin{remark}[the residual condition as ground-state non-decay]
+\label{rem:groundstate}
+Let $L:=\nu\Delta_5-\Div_5(b\,\cdot)=\nu\Delta_5-b\cdot\nabla_5-V_0$. Its formal
+adjoint on $H^1_0(\Omega)$ is $L^*=\nu\Delta_5+b\cdot\nabla_5$, with no
+zero-order term, because the zero-order coefficient of $L^*$ is
+$\Div_5b-V_0=0$; hence $L^*1=0$ identically. On a bounded smooth $\Omega$, at an
+interior maximum of the positive Dirichlet principal eigenfunction $\varphi$ of
+$L^*$ one has $\nabla\varphi=0$ and $\Delta\varphi\le0$, so
+$\lambda\varphi=L^*\varphi=\nu\Delta\varphi\le0$. The Dirichlet realizations of
+$L$ and $L^*$ are adjoint and hence have the same spectrum, so the principal
+eigenvalue of $L$ on $\Omega$ is also $\le0$; a positive supersolution of
+$L\kappa\le0$ therefore exists on every ball. No local Dirichlet-eigenvalue
+test can exclude $(\star)$: the zero-order term $V_0=\Div_5b$ is exactly what
+cancels in $L^*$.
+
+What $(\star)$ adds is uniformity at spatial infinity. A positive solution $n$
+of $Ln=0$ is a positive solution of \eqref{eq:dual}, and if it satisfies
+\begin{equation}\label{eq:groundbounds}
+n\ge c>0,\qquad |\nabla_5\log n|\le C ,
+\end{equation}
+then $(\star)$ holds with $\kappa=n$. Conversely, $(\star)$ supplies a positive
+supersolution $\kappa$; the whole-space ground state of $L$ is the natural
+candidate for a solution with the same bounds, but the passage from a
+supersolution to a bounded-below solution is precisely the step that the
+criticality theory of Pinsky, Murata and Pinchover does not provide: it
+describes the cone of positive solutions and its Martin representation, not
+their size at infinity.
+The averaged, Fisher and primitive tests above are likewise blind to the
+behaviour of $n$ at infinity. In the one-dimensional model of \cref{prop:1d}
+the ground state is $n=(\cosh x)^{-b_0/\nu}$, which decays, and $(\star)$
+fails. The residual condition is thus a non-decay statement for the
+ground state of $L$.
+\end{remark}
+
+\section{Structure available in the axisymmetric class}
+
+\begin{proof}[Proof of \cref{prop:W}]
+From $b^\rho=-\psi_\zeta/\rho$ and $\rho>0$,
+\begin{equation}
+\frac{2b^\rho}{\rho}=-\frac{2\psi_\zeta}{\rho^2}
+=\partial_\zeta\Bigl(-\frac{2\psi}{\rho^2}\Bigr)=\partial_\zeta W,
+\qquad W=-\frac{2\psi}{\rho^2}.
+\end{equation}
+By $(H_1)$, $|\nabla\psi|=\rho|b|\le C_0\rho$; by \eqref{eq:axis},
+$\psi_\zeta(0,\zeta)=-\rho b^\rho|_{\rho=0}=0$, so $\psi(0,\zeta)$ is a
+constant, which we remove (the shift does not change $b$): $\psi(0,\zeta)=0$.
+Hence $|\psi|\le C_0\rho^2/2$ and $|W|\le C_0$. The
+Ces\`aro mean of $V_0$ over $\zeta\in[-Z,Z]$ is
+$(W(Z)-W(-Z))/(2Z)\to0$.
+\end{proof}
+
+Thus in the axisymmetric class the zero-order coefficient is an exact
+$\zeta$-derivative of a bounded function, and its Ces\`aro $\zeta$-mean
+vanishes at every $\rho$. This is not available in \cref{prop:mode}, where $V_0$ is an
+arbitrary negative constant. It does not by itself give $(\star)$: the
+invariant-mean criterion \cref{prop:NC} does not exclude a bound state for a
+zero-mean potential, and whether one can occur in this class is open.
+Whether the exact $\zeta$-derivative structure suffices is the precise form of
+the residual obstruction.
+
+\begin{proposition}[a one-dimensional failure of the analogue of $(\star)$]
+\label{prop:1d}
+Let $b_0>0$, $b(x)=-b_0\tanh x$ and $V_0=b'=-b_0\operatorname{sech}^2x$ on
+$\R$. Then there is no $f\in C^2(\R)$ with $f\ge-C$, $|f'|\le C$ and
+\begin{equation}\label{eq:1dstar}
+\nu(f''+f'^2)-bf'\le V_0\qquad\text{on }\R .
+\end{equation}
+\end{proposition}
+\begin{proof}
+Let $B'=b$ with $B(0)=0$, so $B=-b_0\log\cosh x$ and
+$B(x)\to-\infty$ as $x\to\pm\infty$. The function $f_0=B/\nu$ satisfies
+\eqref{eq:1dstar} with equality. Writing $f=f_0+h$, a direct computation gives
+\begin{equation}
+\bigl[\nu(f''+f'^2)-bf'\bigr]-V_0=\nu(h''+h'^2)+bh'.
+\end{equation}
+With $g=h'$ and $\Phi=e^{B/\nu}>0$ this is
+$g'+(b/\nu)g+g^2\le0$, i.e.\ $(\Phi g)'\le-\Phi g^2\le0$. Hence $\Phi g$ is
+nonincreasing, so $g$ can cross zero only from $+$ to $-$.
+On the other hand $f\ge-C$ gives
+$f(x)=f(0)+B(x)/\nu+\int_0^xg\ge-C$, hence
+$\int_0^xg\to+\infty$ as $x\to\pm\infty$. Thus $g$ takes both signs. If every
+positive value of $g$ lay to the left of every negative value, then
+$\int_0^xg=-\int_x^0g\to-\infty$ as $x\to-\infty$, a contradiction. Therefore
+there are $x_1<x_2$ with $g(x_1)<0<g(x_2)$, i.e.\
+$\Phi(x_1)g(x_1)<0<\Phi(x_2)g(x_2)$, contradicting the monotonicity of $\Phi g$.
+The bound $|f'|\le C$ is not used; only $f\ge-C$ is.
+\end{proof}
+
+\begin{lemma}[no one-dimensional reduction in the axisymmetric class]
+\label{lem:no1d}
+Let $b$ be a bounded, axis-regular, divergence-free axisymmetric poloidal
+field.
+\begin{enumerate}
+\item If $b$ depends only on $\rho$, then $b^\rho=A/\rho$; axis regularity
+forces $A=0$, hence $b^\rho=0$ and $V_0=0$.
+\item If $b$ depends only on $\zeta$, then incompressibility reads
+$\partial_\zeta b^\zeta=-b^\rho/\rho$ with the left side independent of
+$\rho$; hence $b^\rho=0$ and $b^\zeta$ is constant, and again $V_0=0$.
+\end{enumerate}
+\end{lemma}
+\begin{proof}
+(i) $(\rho b^\rho)'=0$ gives $b^\rho=A/\rho$, and $b^\rho=O(\rho)$ at the axis
+forces $A=0$. (ii) compare the $\rho$-dependence of both sides. In both cases
+$V_0=2b^\rho/\rho=0$.
+\end{proof}
+
+\begin{remark}
+\Cref{prop:1d} shows that the identities $V_0=b'$ (the one-dimensional form
+of $V_0=\Div_5b$) and $V_0=W'$ with $|W|\le C_0$ do not by themselves imply
+$(\star)$: the model has $W:=b$ bounded and both identities hold. \Cref{lem:no1d}
+shows that this mechanism cannot be embedded in the axisymmetric class, since
+every field with $V_0\not\equiv0$ depends genuinely on both $\rho$ and $\zeta$.
+The identity that the one-dimensional model does not capture is
+$b\cdot\nabla_5W=-WV_0$ of \cref{prop:W}: in one dimension it would read
+$(b+W)W'=0$, hence $V_0=0$. Thus the remaining obstruction is genuinely
+two-dimensional, and a proof (or refutation) of $(\star)$ in the class must use
+that identity.
+\end{remark}
+
+\begin{proposition}[explicit admissible fields]\label{prop:examples}
+(i) Set $W=2\rho^2\zeta e^{-\rho^2}/((1+\rho^2)(1+\zeta^2))$ and let $b$ be the
+poloidal field of $\psi=-\rho^2W/2$. Then $b$ is bounded, axis regular, and
+\begin{equation}\label{eq:field1}
+V_0=\frac{2\rho^2(1-\zeta^2)e^{-\rho^2}}{(1+\rho^2)(1+\zeta^2)^2}
+\end{equation}
+changes sign. For $\nu\ge1/6$ the function
+$\kappa=\exp\bigl(-\tfrac32\rho^2/(1+\rho^2)\bigr)$ satisfies
+$e^{-3/2}\le\kappa\le1$, $|\nabla_5\log\kappa|\le27/(16\sqrt3)$, and
+$L\kappa\le0$; hence $(\star)$ holds for this field.
+(ii) Let $\varepsilon>0$ and $\Phi\in C^2(\R)$ with $0\le\Phi'\le C$ and
+$|\Phi|\le C$, and set
+$W=\Phi(\zeta)/\sqrt{\rho^2+\varepsilon^2}$, with $b$ the poloidal field of
+$\psi=-\rho^2W/2$. Then $V_0=\Phi'/\sqrt{\rho^2+\varepsilon^2}\ge0$ and
+$\kappa\equiv1$ satisfies $L\kappa=-V_0\le0$ for every $\nu>0$; hence
+$(\star)$ holds. For $\Phi=\arctan\zeta$ the field is bounded and
+axis regular.
+\end{proposition}
+\begin{proof}
+(i) Since $b^\rho=(\rho/2)W_\zeta$, for
+$f=\log\kappa=-\lambda\rho^2/(1+\rho^2)$ with $\lambda=3/2$ and $t=\rho^2$,
+\begin{equation}
+\Delta_5f+|\nabla_5f|^2=\frac{4\lambda[t(\lambda-2)-2]}{(1+t)^4},\qquad
+-b^\rho f_\rho-V_0=\frac{2t(1-\zeta^2)e^{-t}}{(1+t)(1+\zeta^2)^2}
+\Bigl(\frac{\lambda t}{(1+t)^2}-1\Bigr).
+\end{equation}
+Since $(1-\zeta^2)/(1+\zeta^2)^2\ge-1/8$ and
+$\lambda t/(1+t)^2-1\le\lambda/4-1\le0$,
+\begin{equation}
+\frac{L\kappa}{\kappa}\le
+\frac{4\nu\lambda[t(\lambda-2)-2]+\tfrac14te^{-t}(1+t)[1+(2-\lambda)t+t^2]}
+{(1+t)^4}.
+\end{equation}
+At $\lambda=3/2$ the first term is at most $-12\nu$, and
+$\max_{t>0}t^ke^{-t}=k^ke^{-k}$ gives
+\begin{equation}
+\tfrac14te^{-t}\bigl(1+\tfrac32t+\tfrac32t^2+t^3\bigr)
+\le\tfrac14\bigl(e^{-1}+6e^{-2}+\tfrac{81}2e^{-3}+256e^{-4}\bigr)<1.972 .
+\end{equation}
+Hence the numerator is at most $-12\nu+1.972<0$ for $\nu\ge1/6$.
+(ii) With $\kappa=1$ one has $\Delta_5\kappa=0$, $\nabla_5\kappa=0$ and
+$\Div_5(b\kappa)=V_0$.
+\end{proof}
+\begin{remark}
+The fields of \cref{prop:examples} are kinematic: they are bounded, axis
+regular, divergence-free poloidal fields satisfying the structural identities
+of \cref{prop:W}, but they are not claimed to be ancient Navier--Stokes
+solutions, nor are they checked against $(H_2)$--$(H_3)$. The proposition only
+shows that the operator-level condition $(\star)$ is not vacuous in the
+admissible class and is not obstructed by a non-decaying radial drift: in (ii)
+$b^\rho\to\Phi'/2$ as $\rho\to\infty$ need not vanish.
+\end{remark}
+
+\begin{remark}[the vorticity gauge]\label{rem:gauge}
+Let $\Omega:=\omega^\theta/\rho$ and $W\ne0$. From the definitions and
+incompressibility,
+\begin{equation}\label{eq:Wident}
+\Delta_5W=2\Omega,\qquad b\cdot\nabla_5W=-WV_0,
+\end{equation}
+and hence $f:=\log|W|$ satisfies the exact identity
+\begin{equation}\label{eq:gauge}
+\nu\bigl(\Delta_5f+|\nabla_5f|^2\bigr)-b\cdot\nabla_5f-V_0=\frac{2\nu\Omega}{W}.
+\end{equation}
+Consequently, if $W$ is time-independent, $|W|\ge c>0$,
+$|W|+|\nabla_5W|\le C$, and $\Omega/W\le0$, then $f$ satisfies $(\star)$
+and $\Gamma\equiv0$ by \cref{thm:star}. The hypothesis carrying the physics is
+$\Omega/W\le0$, a sign of the azimuthal vorticity relative to $W$; no such
+sign is known under $(H_1)$--$(H_3)$. The first identity in \eqref{eq:Wident} is
+the poloidal vorticity equation in lifted form, so \eqref{eq:gauge} exhibits
+exactly where the same-solution coupling would have to enter. When $W$ has a
+zero the gauge is singular; the smoothed gauge $\kappa=|W|+\varepsilon$
+replaces \eqref{eq:gauge} by the defect
+$\bigl(2\nu\Omega\,\mathrm{sgn}(W)-\varepsilon V_0\bigr)/(|W|+\varepsilon)$,
+whose sign still requires a sign of $\Omega$ where $W$ vanishes.
+\end{remark}
+
+\begin{remark}[the $\zeta$-flux of $b^\rho$ is a boundary datum]
+\label{rem:flux}
+Suppose in addition that, at each fixed $\rho$, the one-sided limits
+$c_\pm(\rho):=\tfrac12\lim_{\zeta\to\pm\infty}b^\zeta(\rho,\zeta)$ exist and
+are independent of $\rho$; write $c_\pm$ for the common values. (This is the
+open ``one-constant'' statement; it does not follow from $(H_1)$--$(H_4)$, and
+\cref{prop:W} alone does not give it, since $\psi$ need not have a limit as
+$|\zeta|\to\infty$.) Then $\psi(\rho,\zeta)\to\rho^2c_\pm$ as
+$\zeta\to\pm\infty$, and since $b^\rho=-\psi_\zeta/\rho$,
+\begin{equation}\label{eq:flux}
+\int_{-\infty}^{\infty}b^\rho(\rho,\zeta)\,d\zeta=\rho\,(c_- - c_+).
+\end{equation}
+Without the $\rho$-independence the same computation gives
+$\int b^\rho\,d\zeta=\frac{2}{\rho}\int_0^\rho\rho'\bigl(c_-(\rho')-c_+(\rho')\bigr)\,d\rho'$,
+and the dichotomy below is unchanged.
+Thus the $\zeta$-average of the radial velocity is a far-field datum, not an
+interior quantity. Consequently, if $b^\rho\ge0$ and $c_+=c_-$, then
+\eqref{eq:flux} forces $b^\rho(\rho,\cdot)\equiv0$ for every $\rho$, so
+$V_0\equiv0$ and the equation for $\Phi$ is potential-free: $\Gamma\equiv0$
+then follows from \cref{rem:sssz} (or from \cref{thm:main2} with
+$V_0\equiv0$). Hence, in the one-constant regime with equal far-field axial
+limits, hypothesis \eqref{eq:Hsign} degenerates to the potential-free case; a
+one-signed, not identically vanishing $b^\rho$ can occur only when
+$c_->c_+$. No sign theorem is proved in either case: the pointwise sign of
+$b^\rho$ remains open.
+\end{remark}
+
+\begin{lemma}[the symmetric $\zeta$-mean of the radial velocity vanishes]
+\label{lem:zeromean}
+Let $V=(V^\rho,V^\zeta)$ be bounded and axisymmetric on
+$\{\rho>0\}\times\R$, with
+$\partial_\rho(\rho V^\rho)+\partial_\zeta(\rho V^\zeta)=0$. Then for every
+$\rho>0$ and $Z>0$,
+\begin{equation}\label{eq:zeromean}
+\left|\frac{1}{2Z}\int_{-Z}^{Z}V^\rho(\rho,\zeta)\dd\zeta\right|
+\le \frac{\|V\|_\infty\,\rho}{2Z}.
+\end{equation}
+In particular the symmetric Ces\`aro mean of $V^\rho$ vanishes.
+\end{lemma}
+\begin{proof}
+Set $M_Z(\rho)=\int_{-Z}^{Z}V^\rho(\rho,\zeta)\dd\zeta$. Integrating the
+divergence identity in $\zeta$ over $[-Z,Z]$ gives
+\begin{equation}
+\partial_\rho(\rho M_Z)
+=-\rho\bigl(V^\zeta(\rho,Z)-V^\zeta(\rho,-Z)\bigr).
+\end{equation}
+Since $\rho M_Z(\rho)\to0$ as $\rho\to0$ by axis regularity, integration in
+$\rho$ yields
+\begin{equation}
+\rho M_Z(\rho)
+=-\int_0^\rho \sigma\bigl(V^\zeta(\sigma,Z)-V^\zeta(\sigma,-Z)\bigr)\dd\sigma,
+\end{equation}
+hence $|\rho M_Z(\rho)|\le \|V\|_\infty\rho^2$, which is
+\eqref{eq:zeromean}.
+\end{proof}
+
+\begin{remark}
+\Cref{lem:zeromean} is the Ces\`aro counterpart of \eqref{eq:flux}. The signed
+integral $\int b^\rho\dd\zeta$ may be the nonzero boundary datum
+$\rho(c_--c_+)$, but its symmetric average over $[-Z,Z]$ is $O(1/Z)$ and
+vanishes. The lemma uses only boundedness, incompressibility and axis
+regularity; it does not need the one-constant hypothesis.
+\end{remark}
+
+\section{The escaping plateau}
+
+\begin{proposition}[localisation of a non-vanishing sup]\label{prop:plateau}
+Let $L:=\lim_{t\to-\infty}\|\Gamma(t)\|_\infty$, so that
+$L=\sup_{t\le0}\|\Gamma(t)\|_\infty$. Then $L=0$ if and only if $u=(0,0,c)$. If $L>0$, there are $t_n\to-\infty$
+and $(\rho_n,\zeta_n)$ with $|\Gamma(t_n,\rho_n,\zeta_n)|\ge L/2$ and
+\begin{equation}\label{eq:plateauscale}
+\begin{split}
+\rho_n&\ge(L/C_1)^{1/2}\bigl(1+\sqrt{-t_n}\bigr)^{1/2}\\
+&\sim(L/C_1)^{1/2}(-t_n)^{1/4}\longrightarrow\infty .
+\end{split}
+\end{equation}
+\end{proposition}
+\begin{proof}
+$M(t)=\|\Gamma(t)\|_\infty$ is non-increasing forward in time, since at an
+interior maximum $\nabla\Gamma=0$, $\Delta_\mu\Gamma\le0$ and
+$\partial_t\Gamma=\nu\Delta_\mu\Gamma\le0$ (with the usual limiting argument
+for non-attainment). Hence $L=\lim M$ exists. If $L=0$, $M\equiv0$ and
+\cref{thm:KNSS} plus $(H_4)$ give the conclusion; conversely $u=(0,0,c)$
+gives $\Gamma\equiv0$. If $L>0$, choose $t_n,\rho_n,\zeta_n$ with
+$|\Gamma|\ge L/2$; \eqref{eq:bound} gives
+$L/2\le C_1\rho_n^2/(2(1+\sqrt{-t_n}))$, which is \eqref{eq:plateauscale}.
+\end{proof}
+
+\begin{proposition}[no pointwise argument can decide it]\label{prop:witness}
+For $L>0$ and $s=-t$, the field
+\begin{equation}\label{eq:witness}
+\Gamma(t,\rho,\zeta)
+=L\bigl(1-e^{-(\rho/r_*(s))^2}\bigr)e^{-(\zeta/r_*(s))^2},
+\qquad r_*(s)=\max\{s,1\}^{1/4},
+\end{equation}
+with $b\equiv0$, is smooth, axis-regular, satisfies $(H_1)$, $(H_3)$ and
+$(H_2)$ with an absolute constant times $L$ (namely $2L(1+s^{-1/2})$ for
+$s\ge1$ and an absolute constant for $s\le1$), and has
+$\sup|\Gamma|=L$; nevertheless $\Gamma(t,\rho_0,\zeta)\to0$ as
+$|\zeta|\to\infty$ at every fixed $(t,\rho_0)$, and $\Gamma(t,\rho_0,\zeta)\to0$
+as $t\to-\infty$ at fixed $(\rho_0,\zeta)$. It is not a Navier--Stokes
+solution.
+\end{proposition}
+
+Consequently no pointwise consequence of $(H_1)$--$(H_3)$, and no
+fixed-$\rho$ far-field statement, can exclude the plateau: the exclusion must
+use the momentum--swirl coupling of the same solution. In the language of
+\cref{thm:main2}, hypothesis \eqref{eq:Hsign} is exactly what the pointwise
+theory cannot supply.
+
+\begin{proposition}[the plateau scale is not localised by the pointwise bounds]
+\label{prop:plateauscales}
+For every $\alpha>1/4$ and $L>0$ there is a smooth, divergence-free,
+axis-regular, ancient axisymmetric field satisfying $(H_1)$--$(H_4)$ with
+$\sup|\Gamma|=L$ and $|\Gamma|=L$ on a set containing points with
+$\rho\sim(-t)^\alpha$. It is not a Navier--Stokes solution.
+\end{proposition}
+\begin{proof}
+Let $s=-t$, $A(s)=\max\{s,1\}^\alpha$, and choose
+$\chi,\eta\in C_c^\infty(\R)$ with $\chi=1$ on $[1,2]$, $\chi=0$ outside
+$[1/4,3]$, $\eta=1$ on $[-1/2,1/2]$, $\eta=0$ outside $[-1,1]$. Put
+\begin{equation}
+\Gamma(t,\rho,\zeta)=L\,\chi\bigl(\rho/A(s)\bigr)\,
+\eta\bigl(\zeta/A(s)\bigr),\qquad
+u=\frac{\Gamma}{\rho}e_\theta,\qquad b=0,\qquad p=0.
+\end{equation}
+Then $u$ is smooth and axis regular because $\Gamma=0$ for $\rho\le A/4$;
+$(H_1)$ and $(H_3)$ follow from $|u|\le4L/A\le4L$ and $|\Gamma|\le L$, and
+$(H_4)$ is $p=0$. The vorticity is
+$\omega^\zeta=\rho^{-1}\partial_\rho\Gamma$,
+$\omega^\rho=-\partial_\zeta u^\theta$, supported where
+$A/4\le\rho\le3A$ and $|\zeta|\le A$, with $|\omega|\le K L/A^2$. On this
+support $R=1+\sqrt{\rho^2+\zeta^2}+\sqrt s\le(2+\sqrt{10})A^2$ for $A\ge1$,
+because $\alpha>1/4$ gives $\sqrt s\le A^2$. Hence
+$|\omega|R\le K(2+\sqrt{10})L$, which is $(H_2)$. The field equals $L$ on
+$\{\rho\in[A,2A],\ |\zeta|\le A/2\}$, so $\sup|\Gamma|=L$ and there are
+points with $\rho=A(s)\sim s^\alpha$. It is not a Navier--Stokes solution
+because $\partial_t\Gamma-\nu\Delta_\mu\Gamma\ne0$.
+\end{proof}
+
+\begin{remark}
+In particular the lower bound \eqref{eq:plateauscale} is sharp and no upper
+bound on $\rho_n(-t_n)^{-1/4}$ follows from $(H_1)$--$(H_4)$. For an actual
+Navier--Stokes solution an upper localisation is a dynamical statement, not a
+pointwise one.
+\end{remark}
+
+\begin{remark}[the exactly uniform-axial class is rigid]
+\label{rem:axialrigid}
+Suppose the poloidal velocity is exactly a uniform axial flow,
+$b=(0,0,c)$ with $c\in\R$ constant, so that
+$u=u^\theta(\rho,\zeta,t)e_\theta+c e_z$. Then $\Gamma\equiv0$. Indeed, the
+swirl equation is $\partial_t\Gamma+c\partial_\zeta\Gamma
+=\nu\Delta_\mu\Gamma$ and, with $\Phi=\Gamma/\rho^2$,
+\begin{equation}
+\Delta_\mu\Gamma
+=\rho^2\Bigl(\partial_\rho^2+\frac3\rho\partial_\rho
++\partial_\zeta^2\Bigr)\Phi
+=\rho^2\Delta_5\Phi,
+\end{equation}
+so $\partial_t\Phi+c\partial_\zeta\Phi=\nu\Delta_5\Phi$ on $\R^5$; in the
+frame $\xi=\zeta-ct$ this is the heat equation
+$\partial_t\Phi=\nu\Delta_5\Phi$, with $\Delta_5$ acting in $(\rho,\xi)$.
+By \cref{prop:bound} (which uses $(H_2)$),
+$|\Phi(t,\rho,\zeta)|\le C_1/(2(1+\sqrt{-t}))\le C_1/2$, so $\Phi$ is bounded.
+A bounded ancient solution of the heat equation on $\R^5$ is spatially
+constant: for $x,x'\in\R^5$ and $R>0$, the backward representation gives
+\begin{equation}
+|\Phi(t,x)-\Phi(t,x')|
+\le \|\Phi\|_\infty
+\|K_R(\cdot-x)-K_R(\cdot-x')\|_{L^1}\longrightarrow0
+\quad(R\to\infty),
+\end{equation}
+where $K_R$ is the heat kernel of variance $2\nu R^2$. Hence $\Phi\equiv C$,
+$\Gamma=C\rho^2$, and $(H_3)$ forces $C=0$.
+\end{remark}
+
+\subsection{The axial-speed branch: exact averaging and the obstruction}
+
+At the plateau scale $s=-t$ set
+\begin{equation}
+y=(\rho,\zeta)s^{-1/4},\qquad U(y,s)=u(t,x),\qquad
+G(y,s)=\Gamma(t,x),\qquad P(y,s)=p(t,x).
+\end{equation}
+A direct computation gives the exact residuals
+\begin{align}
+0&=-\partial_sU+\frac{1}{4s}y\cdot\grad U
++s^{-1/4}\bigl(U\cdot\grad U+\grad P\bigr)
+-s^{-3/4}\frac{G^2}{\rho^3}e_\rho
+-\nu s^{-1/2}\Bigl(\Delta_yU-\frac{U}{\rho^2}\Bigr),
+\label{eq:resU}\\
+0&=-\partial_sG+\frac{1}{4s}y\cdot\grad G
++s^{-1/4}U\cdot\grad G
+-\nu s^{-1/2}\Delta_\mu G,
+\label{eq:resG}
+\end{align}
+with $\Delta_\mu=\partial_\rho^2-\rho^{-1}\partial_\rho+\partial_\zeta^2$.
+
+Write $b=(b^\rho,b^\zeta)$ for the poloidal velocity and $c$ for a putative
+nonzero blow-down axial speed. In the frame $\xi=\zeta-c\tau$ with $\tau=t$
+the transport term is $b^\rho\partial_\rho G+(b^\zeta-c)\partial_\xi G$; the
+constant $c$ drops out after averaging in $\xi$.
+
+\begin{proposition}[exact averaged equation and correlation bound]
+\label{prop:average}
+Let $G$ be a bounded smooth solution of the swirl equation on a slab, written
+in the time variable $\tau=t=-s$ and the frame $\xi=\zeta-c\tau$, and let
+$\langle\cdot\rangle$ denote the symmetric $\xi$-Ces\`aro mean at fixed
+$\tau$. Then
+\begin{equation}\label{eq:avg}
+\partial_\tau\langle G\rangle
++\frac1\rho\partial_\rho\bigl(\rho\,C\bigr)
+=\nu\Delta_\mu\langle G\rangle,
+\qquad C:=\langle b^\rho G\rangle .
+\end{equation}
+Moreover
+\begin{equation}\label{eq:corr}
+|C|\le\frac{C_0C_1}{2}\frac{\rho^2}{1+\sqrt s},
+\qquad\text{and trivially}\quad |C|\le C_0C_2 .
+\end{equation}
+\end{proposition}
+\begin{proof}
+The swirl equation
+$\partial_t\Gamma+b^\rho\partial_\rho\Gamma+b^\zeta\partial_\zeta\Gamma
+=\nu\Delta_\mu\Gamma$ becomes, with $\tau=t$ and in the frame
+$\xi=\zeta-c\tau$,
+$\partial_\tau G+b^\rho\partial_\rho G+(b^\zeta-c)\partial_\xi G
+=\nu\Delta_\mu G$. The symmetric average in $\xi$ kills the
+$(b^\zeta-c)\partial_\xi G$ term. For the radial term,
+$\int b^\rho\partial_\rho G\,d\xi
+=\partial_\rho\int b^\rho G\,d\xi-\int(\partial_\rho b^\rho)G\,d\xi$;
+divergence-free gives
+$\partial_\rho b^\rho+b^\rho/\rho+\partial_\xi b^\zeta=0$, so
+$-\int(\partial_\rho b^\rho)G=\int(b^\rho/\rho+\partial_\xi b^\zeta)G
+=\langle b^\rho G\rangle/\rho$, and \eqref{eq:avg} follows. For
+\eqref{eq:corr}, $b^\rho=\rho W_\zeta/2$ with $W=-2\psi/\rho^2$ and
+$|W|\le C_0$ by \cref{prop:W}; $(H_2)$ gives
+$|\omega^\rho|=|\partial_\zeta u^\theta|=|\Gamma_\zeta|/\rho\le C_1/R$.
+For $Z>0$ write $\langle f\rangle_Z=(2Z)^{-1}\int_{-Z}^Zf\,d\xi$. Since
+$b^\rho=\rho W_\zeta/2$,
+\begin{equation}
+C_Z=\frac{\rho}{2}\langle W_\zeta G\rangle_Z
+=-\frac{\rho}{2}\langle WG_\zeta\rangle_Z
++\frac{\rho}{4Z}\bigl[WG\bigr]_{-Z}^{Z}.
+\end{equation}
+The boundary term is $O(\rho C_0C_2/Z)$, so in the Ces\`aro limit
+$C=(\rho/2)\langle W_\zeta G\rangle=-(\rho/2)\langle WG_\zeta\rangle$, and
+hence
+$|C|\le(\rho/2)\|W\|_\infty\|\Gamma_\zeta\|_\infty\le
+(C_0C_1/2)\rho^2/(1+\sqrt s)$. The trivial estimate
+$|C|\le\|b^\rho\|_\infty\|G\|_\infty\le C_0C_2$ gives the second bound in
+\eqref{eq:corr}.
+\end{proof}
+
+\begin{remark}[why the averaged equation does not close]
+At a plateau point with $\rho\sim s^{1/4}$ the bound \eqref{eq:corr} is
+$\Theta(1)$: it neither tends to zero nor has a sign. Freezing the slow time
+and putting $V=(b^\rho,b^\zeta-c)$, $G=\Gamma$, equation \eqref{eq:avg} is
+the transport equation of the two-dimensional lemma with $\langle V^\rho\rangle=0$ \cite{companion}, and
+$C$ is the linear (averaged) counterpart of the sign-indefinite bounded-class
+flux of the companion paper \cite{companion}. Thus the nonzero
+$c$ branch does not produce a new mechanism: it is the same open
+two-dimensional problem. In particular the slow-time Ces\`aro mean does not
+force $C=0$; the viscous term survives the average and the correlation is
+uncontrolled. Conversely, $C$ is the only obstruction in \eqref{eq:avg} on an
+ancient slab: if $C\equiv0$, then $\langle G\rangle\equiv0$. Indeed, \eqref{eq:avg} then reads
+$\partial_\tau\langle G\rangle=\nu\Delta_\mu\langle G\rangle$; writing
+$\langle G\rangle=\rho^2u$ and using
+$\Delta_\mu(\rho^2u)=\rho^2\Delta_5u$ gives
+$\partial_\tau u=\nu\Delta_5u$ on $\R^5$. Axis regularity makes $u$ smooth
+across the axis. By $(H_2)$ and \cref{prop:bound},
+$|\Phi(t,\rho,\zeta)|=|\Gamma(t,\rho,\zeta)|/\rho^2\le
+C_1/(2(1+\sqrt{-t}))\le C_1/2$ uniformly in $\zeta$, and the $\xi$-average
+preserves this bound; since $u=\langle\Phi\rangle$, $u$ is globally bounded. A bounded
+ancient solution of the heat equation on $\R^5$ is spatially constant (the
+backward-representation argument of \cref{rem:axialrigid}), and
+$u\to0$ as $\rho\to\infty$, so $u\equiv0$. Thus any proof that the correlation
+vanishes would close the averaged branch; the difficulty is exactly that $C$
+has no sign.
+\end{remark}
+
+\begin{remark}[the uniform corrector bound is equivalent to vanishing transport]
+\label{rem:corrector}
+Suppose, in addition, that along $s_n=-t_n$ one has a two-scale expansion
+$U=U_0+s^{-1/4}U_1+o(s^{-1/4})$,
+$G=G_0+s^{-1/4}G_1+o(s^{-1/4})$ with $U_0=(0,0,c)$ and $G_0,G_1$ bounded
+uniformly in $s$. The order-$s^{-1/4}$ balance of \eqref{eq:resG} is
+\begin{equation}\label{eq:order14}
+-\partial_sG_1+U_0\cdot\grad G_0=0,
+\qquad\text{i.e.}\qquad
+\partial_sG_1=c\,\partial_\zeta G_0 .
+\end{equation}
+If $G_1$ is bounded uniformly in $s$, then $c\,\partial_\zeta G_0=0$.
+Conversely, if $c\,\partial_\zeta G_0\ne0$, then
+$G_1(s)=s\,c\,\partial_\zeta G_0+O(1)$ grows linearly in $s$. Hence the
+uniform corrector bound is not a technical hypothesis: within the two-scale
+class it is equivalent to the vanishing of the leading axial transport. The
+zeta-localised field of \cref{prop:witness}, endowed with a uniform axial flow
+and a static profile, has $c\,\partial_\zeta G_0\ne0$ while still satisfying
+$(H_1)$--$(H_4)$, so the pointwise bounds alone do not supply the bound. The
+natural slow
+time is $\tau=\tfrac43s^{3/4}$, not $s$, and the expansion should be written
+on intervals $[s_n,s_n+\delta_n]$ with $\delta_n\to\infty$,
+$\delta_n/s_n\to0$.
+\end{remark}
+
+\begin{remark}[freezing the axial speed needs a pressure estimate]
+\label{rem:pressure}
+The order-$0$ momentum balance in \eqref{eq:resU} is
+$\partial_sU_0=\lim s^{-1/4}\grad_yP$, not $\partial_sU_0=0$: the pressure
+gradient is of the same order as the time derivative. The exact axial family
+$u=(0,0,C(t))$, $p=-C'(t)\zeta+p_0(t)$ satisfies $(H_1)$--$(H_3)$ with
+$\partial_sU_0=C'(s)e_z\ne0$. $(H_4)$ excludes it, since $p\ge-C_3$ for all
+$\zeta$ forces $C'=0$, but the passage from $(H_4)$ to a compactness estimate
+$s^{-1/4}\|\grad_yP\|_{L^\infty(K)}\to0$ is not written here. Thus $c$
+constant is an assumption of any blow-down statement, not a consequence of
+the order-$0$ balance; closing it is an open pressure-compactness input.
+\end{remark}
+
+\begin{openproblem}[the endpoint at $\gamma=0$]
+Prove that $L=0$ in \cref{prop:plateau} for every ancient axisymmetric
+solution satisfying \cref{hyp:main} and \eqref{eq:axis}. Sufficient would be
+any of the following, none of which is proved here: condition $(\star)$
+(\cref{thm:star}); the bounded-class version of the two-dimensional lemma
+(\cite{companion}); or $b^\rho\ge0$ at the plateau points of
+\cref{prop:plateau}. For the branch of nonzero blow-down axial speed, the
+exact averaged equation \eqref{eq:avg} retains the correlation
+$C=\langle b^\rho\Gamma\rangle$, bounded by \eqref{eq:corr} but with no sign
+or identity; closing it is the same bounded-class two-dimensional problem.
+Two further inputs are open: a pressure-compactness estimate freezing the
+axial speed (\cref{rem:pressure}), and an upper localisation of the plateau
+(the kinematic family of \cref{prop:plateauscales} shows that
+$(H_1)$--$(H_4)$ alone do not give it).
+\end{openproblem}
+
+\section*{Funding}
+This research received no specific grant from any funding agency in the
+public, commercial, or not-for-profit sectors.
+
+\section*{Conflict of interest}
+The author declares that there is no conflict of interest.
+
+\section*{Acknowledgement of scope}
+The author makes no claim about the Millennium Prize problem. The results
+above are a restricted-endpoint study: a conditional Liouville theorem, a
+proof that its hypothesis is sharp within the natural weight class, a
+sufficient reduction of the remaining case, and negative results showing that the automatic radial-weight and averaged
+tests cannot supply the sign.
+
+\begin{thebibliography}{9}
+\bibitem{companion}
+\emph{Companion paper}: a bounded-class Liouville lemma for a two-dimensional
+steady advection--diffusion equation, and the classes where it holds.
+% TODO: replace with the final published reference.
+
+\bibitem{KNSS}
+G.~Koch, N.~Nadirashvili, G.~Seregin, V.~\v{S}ver\'ak,
+\emph{Liouville theorems for the Navier--Stokes equations and applications},
+Acta Math. \textbf{203} (2009), 83--105.
+
+\bibitem{Doob}
+J.~L. Doob, \emph{Classical Potential Theory and Its Probabilistic
+Counterpart}, Grundlehren der mathematischen Wissenschaften \textbf{262},
+Springer, 1984.
+
+\bibitem{Pinsky}
+R.~G. Pinsky, \emph{Positive Harmonic Functions and Diffusion},
+Cambridge Studies in Advanced Mathematics \textbf{45}, Cambridge University
+Press, 1995.
+
+\bibitem{SSSZ}
+G.~Seregin, L.~Silvestre, V.~\v{S}ver\'ak, A.~Zlato\v{s}, \emph{On
+divergence-free drifts}, J. Differential Equations \textbf{252} (2012), no.~1,
+505--540; arXiv:1010.6025.
+
+\bibitem{LZZ}
+Z.~Lei, Q.~S. Zhang, N.~Zhao, \emph{Improved Liouville theorems for axially
+symmetric Navier--Stokes equations}, Scientia Sinica Mathematica \textbf{47}
+(2017), no.~10, 1183--1198 (English translation: Science China Mathematics);
+arXiv:1701.00868.
+
+\bibitem{LRZperiodic}
+Z.~Lei, X.~Ren, Q.~S. Zhang, \emph{A Liouville theorem for axi-symmetric
+Navier--Stokes equations on $\R^2\times\mathbb{T}^1$}, Math. Ann.
+\textbf{383} (2022), 415--431.
+
+\bibitem{LRZrate}
+Z.~Lei, X.~Ren, Q.~S. Zhang, \emph{Liouville type theorems for axially symmetric
+Navier--Stokes equations}, Scientia Sinica Mathematica \textbf{51} (2021), no.~6, 971.
+
+\bibitem{PZ}
+X.~Pan, Q.~S. Zhang, \emph{A review of results on axially symmetric
+Navier--Stokes equations}, Anal. Theory Appl. \textbf{38} (2022), 243--296;
+arXiv:2101.04905.
+\end{thebibliography}
+
+\end{document}

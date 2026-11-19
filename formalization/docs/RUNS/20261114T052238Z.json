@@ -1,0 +1,48 @@
+{
+  "time_utc": "20261114T052238Z",
+  "project": ".",
+  "paper": "paperA/mainA.tex",
+  "target": "prop:bound (paper A, l.354)",
+  "stages": {
+    "P5_ranking": {
+      "workflow": "p5-effort-ranking",
+      "run_id": "wf_868a6d21-7fa",
+      "agents": 7, "tokens": 597791, "minutes": 15.8,
+      "mapped": 31,
+      "by_cost": {"easy": 0, "medium": 8, "hard": 14, "not-feasible": 9},
+      "probed": [
+        {"label": "prop:bound", "compiles": true, "lines": 211},
+        {"label": "cor:tradeoff", "compiles": true, "lines": 344},
+        {"label": "prop:timedep", "compiles": true, "lines": 536}
+      ],
+      "recommendation": "prop:bound",
+      "artifact": "docs/P5-RANKING.md",
+      "key_finding": "主结论 thm:main 卡在 Mathlib 完全没有的 Feynman-Kac / 抛物极值原理一层；这不是形式化失败，是判据 (c) 的结论"
+    },
+    "P6_P7_formalization": {
+      "implementation": "Liouville/Bound.lean",
+      "theorems": ["Liouville.PhiExt_bound", "Liouville.PhiExt_bound_tendsto"],
+      "ledger_rows": ["A34", "A35"],
+      "axioms": ["propext", "Classical.choice", "Quot.sound"],
+      "sorry": 0,
+      "gates": {"build": "ok", "sorry": "ok", "axioms": "ok", "ledger": "ok", "docs": "ok"}
+    },
+    "independent_audit": {
+      "workflow": "audit-bound-lemma",
+      "run_id": "wf_9d795142-502",
+      "agents": 4, "tokens": 241500, "minutes": 6.9,
+      "findings": 10,
+      "confirmed": ["C1 轴上 Phi 定义不同 (major, 已修)", "C2 hGamma0 冗余 (minor, 保留)", "C3 SPEC 锐度见证错误 (minor, 已修)", "C4 文档缺陷 (minor, 已修)"],
+      "plausible": [],
+      "artifact": "docs/FIDELITY.md"
+    }
+  },
+  "withdrawn_or_downgraded": [
+    "A34/A35 不升级为 A9：由 (H1)-(H3) 推出 hbound 的一步未形式化，A9 保持 PROVED-INFORMAL",
+    "sup 范数形式 (||Phi(t)||_inf -> 0) 未做，只给逐点一致版"
+  ],
+  "paper_errata_candidates": [
+    "cor:tradeoff: sup_{rho>0} rho^(2-a) < inf 等价于 a>=2 应为 a=2（或把 sup 限制在 rho>=1）",
+    "cor:tradeoff: h''<=h'/rho 推出 h<=C rho^2 在 (0,inf) 上不成立（h=1-rho^2 反例），需补 rho>=1 或 h=O(rho^2) 于 0"
+  ]
+}

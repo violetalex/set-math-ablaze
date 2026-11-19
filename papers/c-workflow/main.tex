@@ -1,0 +1,679 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage[capitalise,nameinlink]{cleveref}
+
+\newtheorem{proposition}{Proposition}
+\newtheorem{definition}[proposition]{Definition}
+\newtheorem{remark}[proposition]{Remark}
+\newtheorem{example}[proposition]{Example}
+
+\newcommand{\Lean}{Lean}
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\claim}[1]{\textbf{#1}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+\title{A verification-first workflow for research mathematics:\\
+separating machine-checked, human-proved, conditional,\\
+and open claims}
+\author{Fan Li\\[8pt]
+{\small School of Petroleum Engineering, China University of Petroleum (East China),}\\[2pt]
+{\small Qingdao 266580, China}}
+\date{}
+
+\emergencystretch=1.5em
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+A research paper in analysis makes assertions of several different strengths
+within the same page: a theorem that is completely proved, a lemma whose proof
+omits a standard but unpublished estimate, a conclusion that holds only under
+an unproved hypothesis, a conjecture stated as a remark. When a paper is
+written and revised over months, these strengths drift. We describe a workflow
+that makes the strength of every assertion a machine-readable attribute,
+attaches it to a specific declaration when a proof has been checked by a proof
+assistant, and re-checks the whole set on every change. The workflow separates
+two kinds of work: deterministic bookkeeping (which is code, with unit tests
+and a self-test that deliberately breaks each gate to confirm it fires) and
+mathematical judgement (which is not code, and is subjected to independent
+adversarial audit).
+We report a case study: an ancient axisymmetric Navier--Stokes paper with
+thirty-five ledger entries, of which two were brought to \Lean~4 + Mathlib with
+a clean axiom footprint, and nine were found to be blocked by missing library
+theory rather than by effort. We describe the failure modes the
+workflow actually caught, including two that no compiler would catch: a
+formal statement that silently weakened the paper's statement at a boundary
+point, and a lemma whose printed hypotheses were too weak for its printed
+conclusion. We are explicit about what the workflow does not do: it does not
+verify informal mathematics, it does not certify that a formal statement is the
+intended one, and its audit layer is a set of prompts and adversarial reviews,
+not an algorithm.
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+\subsection{The problem: claim drift}
+
+A mathematical manuscript is not a list of theorems with proofs attached. It is
+a layered document in which the \emph{strength} of each assertion varies
+continuously with location: the abstract says ``we prove'', Section 3 says
+``we prove, assuming'', Section 5 says ``this should be standard'', and a
+footnote says ``we were unable to close this step''. The reader reconstructs
+the true status from context. This works, approximately, when the paper is
+short and the reader is an expert in exactly this subfield.
+
+It fails in three specific ways.
+
+\begin{enumerate}
+\item \textbf{Promotion.} A conditional statement loses its hypothesis as it
+  travels from the theorem statement into the abstract, the introduction, or a
+  later citation of the paper by someone else.
+\item \textbf{Loss.} A step that was proved by asserting ``the standard
+  maximum principle applies'' enters the main line silently, and the fact that
+  the applicable notion of solution was never checked disappears.
+\item \textbf{Drift.} A paper revised over months accumulates statements that
+  were true of an earlier version of the argument. Nothing in the file format
+  notices.
+\end{enumerate}
+
+Machine-checked mathematics addresses \emph{loss} for the steps that are
+formalized, and nothing else. A proof assistant does not know what the paper
+claims; it knows what the user wrote in its input language. The gap between
+those two objects is where the interesting failures now occur, and it is not
+made smaller by proving more theorems.
+
+\subsection{What we describe}
+
+We describe a workflow, implemented as a small tool (\code{mathlean}) and a
+set of staged procedures, whose organizing principle is:
+
+\begin{quote}
+Every occurrence of ``we prove $X$'' in the paper must resolve to a row of a
+ledger, and every row must carry one of a small number of claim states.
+\end{quote}
+
+The states are not a grading of difficulty. They are a partition by
+\emph{what kind of evidence exists}:
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+State & Evidence \\
+\midrule
+\claim{PROVED} & a proof assistant accepted a declaration, with a checked axiom set \\
+\claim{PROVED-INFORMAL} & a complete human proof exists in the paper \\
+\claim{CONDITIONAL} & a complete proof of an implication; the hypothesis is unproved \\
+\claim{OPEN} & neither a proof nor a counterexample \\
+\claim{REFUTED} & a counterexample, recorded \\
+\claim{CITED} & attributed to another work, not proved here \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The ledger is a table in a Markdown file, checked into the same repository as
+the manuscript. A script verifies its internal consistency, verifies that every
+\claim{PROVED} row names a declaration that exists in the source, and verifies
+that every named declaration has been axiom-audited.
+
+The workflow adds two things that are, in our experience, the ones that
+matter.
+
+\textbf{First, a deterministic core.} The checking is code with unit tests, and
+the checking code is itself tested by deliberately constructing broken projects
+and confirming that each gate fires. A gate that has never been seen to fail is
+decoration.
+
+\textbf{Second, an adversarial audit layer.} The steps that require judgement
+--- is this statement the paper's statement? does this proof use its own
+conclusion? does this limit commute? --- are not handed to a single reviewer.
+They are attacked by several independent reviewers with different assigned
+lenses, and only ``confirmed'' findings are allowed to modify the text.
+
+\subsection{Artifacts}
+
+The checker, the case-study formalization, and the ledger of the two papers are
+distributed as source repositories so that every claim in this document can be
+re-run rather than believed. % TODO: insert the two repository URLs before submission.
+
+\subsection{What this is not}
+
+We are explicit, because the framing invites overstatement.
+
+\begin{itemize}
+\item This is not a method for proving theorems automatically. The mathematics
+  is human (or, in our runs, human-directed model output) mathematics. The
+  workflow organizes evidence; it does not produce it.
+\item This is not a guarantee of correctness. A \claim{PROVED} row guarantees
+  that a certain formal statement follows from certain formal hypotheses under
+  a checked axiom set. It does not guarantee that the formal statement is the
+  intended one. That is the job of a separate audit, and the audit is
+  fallible.
+\item The audit layer is a protocol and a set of prompts. It has no correctness
+  theorem. We report what it caught and what it missed, and the misses are part
+  of the case study.
+\end{itemize}
+
+\section{The ledger}
+
+\subsection{Format}
+
+The ledger is a Markdown table with six columns: identifier, state, statement,
+\Lean{} declaration (if any), dependencies, and notes. It is deliberately a
+human-readable file rather than a serialization format, because it has to be
+read and edited by the author and eventually typeset as an appendix.
+
+Two parser details turned out to matter in practice, and both are
+consequences of choosing Markdown:
+
+\begin{itemize}
+\item The identifier column is matched in full, so an identifier containing a
+  lowercase suffix is silently ignored. In our first run an entry
+  \code{A9a} was dropped by the parser and the ledger silently remained one
+  row shorter than the author believed. The fix was to change the entry, not
+  the parser; but the general lesson is that a lenient format plus a strict
+  parser produces silent loss.
+\item The declaration column holds one name, not a list. An entry naming two
+  declarations fails the ``declaration exists'' check for the concatenation.
+  This forces one row per checkable object, which is the right granularity
+  anyway.
+\end{itemize}
+
+\subsection{What the ledger is checked against}
+
+The ledger gate verifies four things:
+
+\begin{enumerate}
+\item every row's state is one of the six legal values;
+\item every \claim{CONDITIONAL} row has a nonempty note identifying its
+  hypothesis, and every \claim{REFUTED} row has a note containing a
+  counterexample;
+\item every \claim{PROVED} row names a declaration that the source actually
+  contains, and that declaration appears in the axiom-audit file;
+\item the dependency relation is acyclic.
+\end{enumerate}
+
+The fourth item is not bookkeeping. In our case study the most serious
+mathematical error found during the audit was a circularity of exactly this
+shape: a lemma $G_1$ was used to conclude that a leading-order transport term
+vanishes, while the boundedness of $G_1$ was \emph{equivalent} to the vanishing
+of that term. The implication was true, the proof was correct, and the
+conclusion was empty. A dependency check does not detect this by itself ---
+the two statements do not literally depend on each other --- but it does
+force the equivalence to be written down, which is what made it visible.
+
+\section{The pipeline}
+
+The workflow is organized in ten stages, each with a named artifact and a pass
+condition. Stages are not a waterfall: P2--P4 form a loop, and P6--P7 form
+another.
+
+\begin{center}
+\begin{tabular}{@{}p{0.06\textwidth}p{0.22\textwidth}p{0.56\textwidth}@{}}
+\toprule
+Stage & Artifact & Pass condition \\
+\midrule
+P0 & \code{SPEC.md} & objects, hypotheses, conclusion with explicit
+  quantifiers, and at least three falsifiability tests \\
+P1 & \code{CITATIONS.md} & every reference carries an identifier and has been
+  independently re-opened \\
+P2 & \code{LEMMAS.md} & each lemma has statement, proof, dependencies, state \\
+P3 & \code{COUNTEREXAMPLES.md} & each lemma attacked by at least one lens; no
+  unexplained numerical violation \\
+P4 & \code{AUDIT.md} & each finding classified \textbf{confirmed} /
+  \textbf{plausible} / \textbf{refuted} \\
+P5 & \code{FORMALIZATION.md} & each lemma mapped to a \Lean{} statement or
+  marked out of scope with the missing theory named \\
+P6 & \code{Lean/} & five gates green \\
+P7 & \code{FIDELITY.md} & each formal statement compared to the specification
+  and classified \textbf{match} / \textbf{weaker} / \textbf{stronger} /
+  \textbf{different} \\
+P8 & \code{CLAIMS.md} & every assertion in the paper resolves to a row \\
+P9 & \code{FINAL.md} & the terminal checklist \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Two design decisions in this table are worth isolating.
+
+\textbf{P0 forbids generalization.} The most common way for a statement-locking
+stage to fail is to ``strengthen'' the problem. In a rehearsal run on the
+elementary inequality $2ab \le a^2+b^2$, the specification stage generalized
+the statement to arbitrary linearly ordered commutative rings. Every
+downstream attack then explored zero divisors, and no agent touched the actual
+inequality. The rule we adopted is that generalizations may appear only in an
+``out of scope'' section, never in the hypotheses or the conclusion.
+
+\textbf{P5 is an estimate, not a judgement of truth.} The formalization
+mapping classifies each lemma as \emph{easy}, \emph{medium}, \emph{hard}, or
+\emph{not feasible}, where the classes are statements about the state of the
+library, not about the mathematics. A false lemma can be \emph{medium} and a
+true one \emph{not feasible}. Conflating the two is a category error, and we
+have seen it made.
+
+\section{The deterministic core}
+
+\subsection{What is code}
+
+Everything that can be decided mechanically is implemented in a dependency-free
+Python package of roughly two thousand lines, with 75 unit tests and 12
+self-test scenarios:
+
+\begin{itemize}
+\item scaffolding a project and vendoring the checker into it;
+\item comment-aware scanning for \code{sorry} and \code{admit};
+\item running the axiom audit and parsing its output;
+\item parsing and checking the ledger;
+\item checking that the stage artifacts exist;
+\item reporting, with an actionable fix, why the environment is broken.
+\end{itemize}
+
+The comment-aware scanner deserves a remark, because our first implementation
+was a regular expression. It matched the word \code{sorry} inside a
+documentation string that said ``\code{sorry} is not allowed'', and the gate
+went red on a correct project. Real \Lean{} source has nestable block comments,
+line comments, and string literals containing dashes. The scanner now walks the
+source character by character and preserves line numbering, because a scanner
+whose reported line numbers drift is a scanner nobody trusts.
+
+\subsection{The five gates}
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Gate & Question \\
+\midrule
+\code{build} & does the library compile? \\
+\code{sorry} & is there an admitted hole? \\
+\code{axioms} & does each public declaration depend only on permitted axioms? \\
+\code{ledger} & does every claim resolve, and is the dependency graph acyclic? \\
+\code{docs} & are the stage artifacts present? \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The first three gates concern whether something was proved. The fourth
+concerns whether the thing proved is the thing claimed. The fifth is
+hygiene.
+
+The axiom gate is stronger than ``the build succeeded'' in a way that
+matters. A \Lean{} file can compile while depending on \code{sorryAx} (via an
+admitted lemma) or on a user-declared \code{axiom}. Neither appears in the
+source of the theorem being checked. The gate therefore runs
+\code{\#print axioms} on every public declaration and compares the transitive
+closure against a whitelist, by default \{\code{propext},
+\code{Classical.choice}, \code{Quot.sound}\}. Custom axioms are permitted
+only if they are registered in the ledger with a description of what they
+correspond to in the paper.
+
+\subsection{Testing the tests}
+
+A gate is only evidence if it has been observed to fail on the thing it
+claims to catch. The self-test constructs a temporary project and breaks it in
+twelve ways, one per scenario: a genuine \code{sorry}; the word
+\code{sorry} inside a comment; a \claim{PROVED} row naming a
+nonexistent declaration; a \claim{PROVED} row with no axiom audit; a
+\claim{CONDITIONAL} row with no hypothesis; a \claim{REFUTED} row with no
+counterexample; an illegal state; a dependency cycle; an unregistered custom
+axiom; and a registered custom axiom that must be allowed. Each scenario
+asserts both the verdict and the reason.
+
+The self-test found real defects in the checker, including a template project
+that passed the documentation gate because the scaffolding generated the
+artifact files that the gate was looking for. The gate was checking for
+existence, and the scaffolding guaranteed existence. It now checks that the
+artifact has been edited since generation.
+
+\section{The judgement layer}
+
+\subsection{Why independent review}
+
+The errors that a formalization does not catch are not arithmetic errors. They
+are errors of the following kinds, all drawn from our case study:
+
+\begin{itemize}
+\item a formal statement that is weaker than the paper's at a boundary point;
+\item a formal statement that is stronger than the paper's, because a
+  hypothesis was dropped;
+\item a proof that is correct but whose conclusion was already assumed;
+\item a printed lemma whose hypotheses do not imply its printed conclusion;
+\item a quantitative claim whose stated range of validity is wrong.
+\end{itemize}
+
+Each of these is invisible to a compiler and visible to a reader who is
+looking for it. The workflow therefore assigns lenses. Attackers are given the
+specification, the paper, and the formal source, and are told to falsify; they
+are not told the author's confidence.
+
+\subsection{Adjudication}
+
+Findings carry one of three verdicts. \textbf{confirmed} means the reviewer
+can exhibit the specific error. \textbf{plausible} means there is a concrete
+doubt that has not been closed. \textbf{refuted} means the reviewer's own
+objection was wrong. Only \textbf{confirmed} may modify the text;
+\textbf{plausible} goes to a backlog. The loop terminates when two consecutive
+rounds produce no new \textbf{confirmed} finding.
+
+Reviewers disagree, and the disagreements are recorded rather than resolved by
+majority. In our run, two auditors made opposite claims about whether a
+simplified quantity made a hypothesis stronger or weaker; the record preserves
+both statements, and the resolution cites the direction of an inequality. The
+value of keeping the disagreement is that it shows which claims are
+load-bearing and which were asserted casually.
+
+\subsection{The cost of judgement}
+
+Adversarial review is the expensive part, and the budget must be explicit. Our
+configuration caps the number of reviewer agents per round and the number of
+findings adjudicated, sorts findings by severity before spending reviewers on
+them, and reports what was skipped. The failure mode to avoid is silent
+truncation: a run that reviewed the first six findings and stopped reads
+exactly like a run that found six findings.
+
+\section{Case study: an ancient axisymmetric Navier--Stokes paper}
+
+\subsection{The project}
+
+The subject is a paper on ancient (global backward in time) axisymmetric
+solutions of the three-dimensional incompressible Navier--Stokes equations with
+swirl, in the scaling-critical Koch--\allowbreak Nadirashvili--\allowbreak Seregin--\allowbreak \v{S}ver\'ak class
+at the endpoint $\gamma=0$ \cite{KNSS}. The paper proves a conditional rigidity
+statement and reduces the remaining case to a sufficient condition on
+$\R^5$; it explicitly does not claim an unconditional theorem at the endpoint.
+A companion paper treats a two-dimensional lemma that closes the last step.
+
+The manuscript was audited and formalized as part of its preparation, not
+after publication. That timing is the point: the workflow found errors while
+they were still cheap.
+
+\subsection{What was mapped}
+
+Thirty-one formal statements were extracted from the two papers and classified
+by formalization cost. After deduplicating three restatements, twenty-eight
+independent results remain.
+
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Cost & before dedup & after dedup \\
+\midrule
+easy & 0 & 0 \\
+medium & 8 & 8 \\
+hard & 14 & 12 \\
+not feasible & 9 & 8 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Two observations from the mapping.
+
+\textbf{There was nothing easy.} The cheapest results in the batch --- an
+integral estimate, a weight trade-off computation, and a pointwise identity ---
+each required between two and six hundred lines of \Lean. The reason is not
+that the mathematics is deep; it is that the ambient vocabulary (cylindrical
+coordinates, a weighted Laplacian on $\R^5$, axis regularity) does not exist in
+the library and must be built before the first line of the intended argument
+can be written.
+
+\textbf{The obstruction is a single missing theory.} Nine results were
+classified out of scope. Five of them, including the main theorem, the
+weighted maximum principle and the dual-density criterion, fail at the same
+place: the library has no Feynman--Kac representation, no parabolic maximum
+principle, and no martingale problem for bounded measurable drift. Two more
+fail at the adjacent probabilistic layer (a stochastic-analysis lemma, and a
+lemma whose core is a one-dimensional Bessel hitting probability), one on the
+$n$-dimensional theory of harmonic functions, and one is an external theorem
+that can only be entered as a citation. This is the most useful output of the mapping, and it
+is a statement about \emph{the library}, not about the mathematics: the same
+theorem might be formalizable tomorrow, and the estimate tells you where to
+look.
+
+\subsection{The formalized result}
+
+One result was brought through to a machine-checked statement: the final
+integration step of the uniform bound on the lifted swirl $\Phi = \Gamma/\rho^2$,
+where $\Gamma = \rho u^\theta$ and $R = 1+|x|+\sqrt{-t}$.
+
+The paper's proof ends with
+\begin{equation}
+|\Gamma(\rho,\zeta,t)| \le \int_0^\rho \frac{C_1 r \, dr}{R(r,\zeta,t)}
+\le \frac{C_1 \rho^2}{2(1+\sqrt{-t})},
+\end{equation}
+obtained from $\Gamma(0,\zeta,t)=0$ by the fundamental theorem of calculus.
+The formalization covers this step and its corollary, in which the bound is
+divided by $\rho^2$ and the resulting function of $t$ is shown to tend to zero
+as $t \to -\infty$.
+
+The step from the paper's hypotheses (H1)--(H3) to the pointwise bound
+$|\partial_\rho \Gamma| \le C_1\rho/R$ is the identity
+$\partial_\rho \Gamma = \rho\,\omega^\zeta$ together with $|\omega^\zeta| \le
+|\omega| \le C_1/R$, i.e.\ a curl computation in cylindrical coordinates for a
+vector field on $\R^3$. This is not formalized; it enters the theorem as a
+hypothesis. The ledger row for the full statement therefore remains
+\claim{PROVED-INFORMAL}, and the two \claim{PROVED} rows cover its last step
+and its corollary. The distinction is visible in the repository, in the ledger,
+and in the paper's own statement of the formalization's scope.
+
+\subsection{Three failures the workflow caught}
+
+\paragraph{A boundary point that silently weakened the statement.}
+The lifted variable is $\Phi = \Gamma/\rho^2$. In \Lean, division by zero is
+total and $x/0 = 0$. Writing the theorem with $\Phi$ defined by the literal term
+$\Phi(\rho,\zeta,t) := \Gamma/\rho^2$ therefore makes the statement at
+$\rho = 0$ read $0 \le C_1/(2(1+\sqrt{-t}))$, which is true and says nothing. The paper's $\Phi$ is a smooth lift $g(|y|^2,y_5,t)$ with
+$\Phi(0,\zeta,t) = g(0,\zeta,t)$ in general nonzero. The formal statement had
+been \emph{proved} and was weaker than the paper's at exactly one point.
+
+The independent audit found this; the compiler did not, and could not. The fix
+was to define the extension explicitly, with the limiting value as a parameter,
+and to carry the existence of the limit as a hypothesis. The episode is the
+clearest illustration we have of why P6 and P7 are separate stages: a green
+build is not evidence that the right theorem was stated.
+
+\paragraph{A hypothesis that did not imply its conclusion.}
+A corollary in the paper derived a bound $h \le C\rho^2$ on $(0,\infty)$ from
+the differential inequality $h'' \le h'/\rho$, together with a condition on a
+power weight. The inequality is true on $[\rho_0,\infty)$ for any
+$\rho_0>0$, but false on $(0,\infty)$: the function $h = 1-\rho^2$ satisfies
+the inequality and is not $O(\rho^2)$ at the origin. The corollary needed a
+locality hypothesis that was not printed. This was found by a numerical probe
+and confirmed in \Lean, both before the paper is submitted.
+
+\paragraph{A dependency that was an equivalence.}
+A two-scale reduction argued that a certain bounded correction $G_1$ forces a
+leading-order transport coefficient to vanish. The argument is valid. What the
+audit noticed is that the boundedness of $G_1$ is equivalent, in the class
+considered, to the vanishing of that coefficient. The lemma is therefore
+circular in the sense that it assumes what it concludes, and the paper now
+records the reduction as formal rather than as progress. The published version
+does not claim otherwise.
+
+\subsection{Cost}
+
+For the formalized lemma, the accounting was:
+
+\begin{center}
+\begin{tabular}{@{}lrr@{}}
+\toprule
+Stage & agents & tokens \\
+\midrule
+cost ranking over 31 statements & 7 & 597{,}791 \\
+independent audit of one lemma & 4 & 241{,}500 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+We report these because the alternative --- describing the workflow as cheap
+--- would be false. The audit was worth its cost: it found the boundary-point
+weakening, which is a defect in the formalization that would otherwise have
+been published as a success.
+
+\section{Observations from operation}
+
+The workflow is a program that runs other programs and, in our setup, model
+instances. Several of its failures were in the orchestration rather than in
+the mathematics, and we record them because they are reproducible and because
+they shaped the design.
+
+\paragraph{Structured verdicts.} An early version judged success by whether a
+stage's returned text began with ``OK''. A stage that correctly reported
+``declaration exists, compilation succeeded, verification follows'' was scored
+as a failure, blocking eleven downstream lemmas. Verdicts are now structured
+values, and text is for humans.
+
+\paragraph{Todo lists keyed by identity, not by value.} Removing completed
+items by object identity failed once the objects crossed a dispatch boundary:
+118 dispatches went to four lemmas that had already succeeded, while the
+remaining ten were never attempted. Keying the todo list by identifier removed
+the failure.
+
+\paragraph{Naming the deadlock.} When no lemma is ready, the correct behavior
+is to report which lemma is blocked by which, and stop. Retrying a random
+subset produces activity and no progress; in one rehearsal, the majority of
+139 dispatches fell into this category.
+
+\paragraph{Silent skip is a lie.} A stage that returns nothing must be
+distinguishable from a stage that found nothing. Every bounded stage reports
+its bound.
+
+\section{Related work}
+
+Proof assistants have been used for large-scale formalization projects for
+over a decade \cite{Hales,OddOrder}, and the mathematical library
+\cite{mathlib} behind \Lean~4 \cite{Lean4} now covers substantial parts of
+undergraduate and graduate mathematics. Those projects establish that
+formalization at scale is possible.
+
+Our concern is different and complementary. A large formalization project has
+a specification: the statement to be formalized is fixed by a committee or by a
+prior informal text, and the engineering problem is to reach it. A research
+paper has no such specification; the statement is being discovered while it is
+being proved, and the artifact that must be maintained is not the proof but the
+\emph{map} from claims to evidence. The ledger is that map.
+
+The workflow differs from a purely formal approach in one further respect: it
+treats the informal paper as the primary object and the formalization as one
+kind of evidence among several. A paper whose main theorem is not formalizable
+in the current state of the library is not a failed formalization project; it
+is a paper with an accurate statement about what is and is not checked.
+
+\section{Limitations}
+
+\begin{enumerate}
+\item \textbf{The audit is not an algorithm.} Independent review with assigned
+  lenses found real errors in our case study, and the same protocol missed
+  others that we do not know about. There is no completeness claim.
+\item \textbf{Fidelity is judged, not certified.} The comparison between a
+  formal statement and an informal one is a human judgement recorded in a
+  document. A mis-specified formalization can pass every gate.
+\item \textbf{The cost estimates are local.} ``Not feasible'' means not
+  feasible with the library as it stands, for an author with the author's time.
+  It is not a statement about difficulty.
+\item \textbf{The case study is one project.} The failure modes we report are
+  those that occurred in a paper about a conditional Liouville theorem. Other
+  fields will produce others.
+\item \textbf{Model involvement.} Judgement stages in our runs were executed
+  with model assistance, directed and reviewed by the author. The protocol is
+  designed to make that safe --- every output lands in a file, every file is
+  gated, every gate is self-tested --- but the protocol does not remove the
+  dependence on the author's reading.
+\end{enumerate}
+
+\section{Conclusion}
+
+The contribution we claim is narrow and, we think, transferable: make the
+strength of every assertion a first-class, checked attribute, and make the
+checks themselves testable. The result is a paper that states, in a form a
+script can verify, which of its claims are machine-checked, which are proved on
+paper, which depend on an unproved hypothesis, and which are open.
+
+For the case study, that meant two declarations with a clean axiom footprint, a
+public record of the thirty-three claims that are not machine-checked, and a
+list of nine results blocked by one missing theory rather than by one missing
+idea.
+
+\appendix
+
+\section{Gate definitions}
+
+\begin{description}
+\item[\textbf{build}] \code{lake build} exits zero.
+\item[\textbf{sorry}] the comment-stripped source contains no \code{sorry}
+  or \code{admit}.
+\item[\textbf{axioms}] \code{Audit.lean} compiles, and for every declaration
+  named in it, the transitive axiom set is contained in the configured
+  whitelist. A custom axiom not registered in the ledger is an error.
+\item[\textbf{ledger}] the ledger parses; states are legal; \claim{CONDITIONAL}
+  rows carry hypotheses; \claim{REFUTED} rows carry counterexamples;
+  \claim{PROVED} rows name existing declarations that are axiom-audited; the
+  dependency graph is acyclic.
+\item[\textbf{docs}] the stage artifacts exist and have been modified since
+  scaffolding.
+\end{description}
+
+\section{An excerpt of the ledger}
+
+\begin{center}
+\begin{tabular}{@{}p{0.05\textwidth}p{0.20\textwidth}p{0.27\textwidth}p{0.26\textwidth}@{}}
+\toprule
+ID & State & Claim & Declaration \\
+\midrule
+A2 & \claim{CONDITIONAL} & $\Gamma \equiv 0$ under $b^\rho \ge 0$ & --- \\
+A4 & \claim{CONDITIONAL} & $\Gamma \equiv 0$ if the scale-free condition
+  $(\star)$ admits a bounded supersolution & --- \\
+A9 & \claim{PROVED-INFORMAL} & uniform backward bound on $\Phi$ & --- \\
+A10 & \claim{PROVED-INFORMAL} & among power weights, only $\rho^2$ is
+  compatible & --- \\
+A13 & \claim{PROVED-INFORMAL} & averaged necessary condition & --- \\
+A27 & \claim{OPEN} & the $\gamma=0$ endpoint in general & --- \\
+A34 & \claim{PROVED} & integration step of A9, for all $\rho \ge 0$ &
+  \code{PhiExt\_bound} \\
+A35 & \claim{PROVED} & corollary: $\Phi \to 0$ uniformly in the past &
+  \code{PhiExt\_bound\_tendsto} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Of the thirty-five rows, two are \claim{PROVED}, nineteen
+\claim{PROVED-INFORMAL}, nine \claim{CONDITIONAL}, two \claim{OPEN}, and three
+\claim{CITED}.
+
+\begin{thebibliography}{99}
+
+\bibitem{KNSS}
+G.~Koch, N.~Nadirashvili, G.~Seregin, and V.~\v{S}ver\'ak.
+\newblock Liouville theorems for the Navier--Stokes equations and applications.
+\newblock \emph{Acta Mathematica} \textbf{203} (2009), 83--105.
+
+\bibitem{Lean4}
+L.~de Moura and S.~Ullrich.
+\newblock The Lean 4 theorem prover and programming language.
+\newblock \emph{Automated Deduction -- CADE 28}, Lecture Notes in Computer
+  Science 12699, Springer, 2021, 625--635.
+
+\bibitem{mathlib}
+The mathlib Community.
+\newblock The Lean mathematical library.
+\newblock \emph{Proceedings of the 9th ACM SIGPLAN International Conference on
+  Certified Programs and Proofs (CPP 2020)}, 2020, 367--381.
+
+\bibitem{Hales}
+T.~Hales et al.
+\newblock A formal proof of the Kepler conjecture.
+\newblock \emph{Forum of Mathematics, Pi} \textbf{5} (2017), e2.
+
+\bibitem{OddOrder}
+G.~Gonthier et al.
+\newblock A machine-checked proof of the odd order theorem.
+\newblock \emph{Interactive Theorem Proving (ITP 2013)}, Lecture Notes in
+  Computer Science 7998, Springer, 2013, 163--179.
+
+\end{thebibliography}
+
+\end{document}

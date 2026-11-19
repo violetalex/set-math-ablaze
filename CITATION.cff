@@ -1,0 +1,41 @@
+cff-version: 1.2.0
+message: "If you use the workflow, the papers, or the formalization, please cite as below."
+title: "set-math-ablaze: a verification-first workflow for research mathematics, with papers and a Lean formalization"
+abstract: >-
+  A checker that makes the strength of every mathematical claim a
+  machine-readable attribute, the procedure it enforces, three papers written
+  under that procedure, and the Lean 4 formalization of one of their results.
+authors:
+  - family-names: Li
+    given-names: Fan
+    affiliation: "School of Petroleum Engineering, China University of Petroleum (East China), Qingdao 266580, China"
+license: Apache-2.0
+type: software
+version: 1.0.0
+date-released: 2026-11-19
+keywords:
+  - Lean 4
+  - Mathlib
+  - formal verification
+  - Navier-Stokes
+  - Liouville theorem
+  - research workflow
+references:
+  - type: article
+    title: "A conditional Liouville theorem for ancient axisymmetric Navier-Stokes flow with swirl at the critical endpoint"
+    authors:
+      - family-names: Li
+        given-names: Fan
+    status: submitted
+  - type: article
+    title: "A bounded-class Liouville lemma for a two-dimensional steady advection-diffusion equation, and the classes where it holds"
+    authors:
+      - family-names: Li
+        given-names: Fan
+    status: submitted
+  - type: article
+    title: "A verification-first workflow for research mathematics"
+    authors:
+      - family-names: Li
+        given-names: Fan
+    status: draft

@@ -1,0 +1,10 @@
+set-math-ablaze
+Copyright 2026 Fan Li
+
+This product includes software developed by the Mathlib Community
+(https://github.com/leanprover-community/mathlib4), licensed under the
+Apache License, Version 2.0.
+
+`formalization/tools/mathlean` is a vendored copy of `workflow/mathlean`,
+taken at the release commit. The MIT terms in `workflow/LICENSE` continue to
+apply to that directory; its own copy is at `formalization/tools/LICENSE`.

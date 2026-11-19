@@ -1,0 +1,14 @@
+#!/bin/sh
+# 独立运行 mathlean：不安装、不把当前目录放进 sys.path。
+#
+# 用 `python3 -I`（隔离模式：忽略环境变量、用户 site-packages、当前目录），
+# 再显式把本仓库根目录插进 sys.path。
+set -e
+ROOT=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+exec python3 -I -c '
+import sys
+root = sys.argv.pop(1)
+sys.path.insert(0, root)
+from mathlean.cli import main
+sys.exit(main(sys.argv[1:]))
+' "$ROOT" "$@"

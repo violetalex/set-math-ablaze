@@ -1,0 +1,1003 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage[capitalise,nameinlink]{cleveref}
+\crefname{hypothesis}{Hypothesis}{Hypotheses}
+\crefname{condition}{Condition}{Conditions}
+\crefname{openproblem}{Open Problem}{Open Problems}
+
+\newtheorem{theorem}{Theorem}[section]
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\theoremstyle{definition}
+\newtheorem{hypothesis}[theorem]{Hypothesis}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{condition}[theorem]{Condition}
+\newtheorem{openproblem}[theorem]{Open Problem}
+
+\newcommand{\R}{\mathbb{R}}
+\newcommand{\dd}{\,\mathrm{d}}
+\newcommand{\Div}{\operatorname{div}}
+\newcommand{\grad}{\nabla}
+\emergencystretch=1.5em
+
+\title{A bounded-class Liouville lemma for a two-dimensional steady\\
+advection--diffusion equation, and the classes where it holds}
+\author{Fan Li\\[8pt]
+{\small School of Petroleum Engineering, China University of Petroleum (East China),}\\[2pt]
+{\small Qingdao 266580, China}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+We study the two-dimensional steady advection--diffusion equation
+$V\cdot\nabla G=\nu\Delta_\mu G$ on the half-plane $\{\rho>0\}\times\R$, where
+$\Delta_\mu=\partial_\rho^2-\rho^{-1}\partial_\rho+\partial_\zeta^2$ and $V$ is
+a bounded weighted-divergence-free field,
+$\partial_\rho(\rho V^\rho)+\partial_\zeta(\rho V^\zeta)=0$, the meridional
+velocity of an incompressible axisymmetric field. For axis-regular
+$G\in C^2\cap L^\infty$ with $G=O(\rho^2)$ we prove $G\equiv0$ in the decay
+class, for shear velocity fields, for zero-advection solutions, and for the
+product ansatz $G=\varphi(\rho)h(\zeta)$ over a large range of profiles: for
+every positive nonconstant $2\pi$-periodic $h\in C^2(\R)$, flat minima
+included and with no restriction on the order or the number of the minima,
+whenever $\varphi$ satisfies two one-dimensional tail conditions. The proof
+reduces the level curves of $G$ to the circle through an exact identity. The
+obstruction is a sign-indefinite bulk flux with no gradient factor, and we
+show that weighted incompressibility is essential by an explicit bounded
+counterexample. The general bounded class remains open.
+\end{abstract}
+
+\section{Introduction}
+
+\subsection{The equation}
+Let $\nu>0$. On the half-plane $\{\rho>0\}\times\R$ consider the steady
+equation
+\begin{equation}\label{eq:2d-intro}
+V\cdot\nabla G=\nu\Delta_\mu G,\qquad
+\Delta_\mu:=\partial_\rho^2-\frac1\rho\partial_\rho+\partial_\zeta^2 ,
+\end{equation}
+for a bounded field $V=(V^\rho,V^\zeta)$ that is \emph{weighted
+divergence-free},
+\begin{equation}\label{eq:wdiv-intro}
+\partial_\rho(\rho V^\rho)+\partial_\zeta(\rho V^\zeta)=0 ;
+\end{equation}
+this is exactly the class of meridional velocities of bounded incompressible
+axisymmetric fields on $\R^3$, written in cylindrical coordinates with the
+axis $\rho=0$ included. The operator $\Delta_\mu$ is the axisymmetric
+Laplacian acting on scalars that are even in $\rho$; it is self-adjoint in
+$L^2(\rho^{-1}d\rho\,d\zeta)$.
+
+The equation is natural in its own right --- it is the steady advection
+equation for a scalar carried by an incompressible meridional flow, at the
+scaling-critical regularity of the classical Liouville theory --- and it is
+also exactly the problem that the endpoint of the axisymmetric
+Navier--Stokes Liouville theorem reduces to, see
+\cite{companion}; the reader who wants only the two-dimensional statement may
+ignore that origin entirely.
+
+We ask: does \eqref{eq:2d-intro} admit a nonzero bounded solution in the
+axisymmetric class? The answer is yes for the linear theory without
+\eqref{eq:wdiv-intro} (\S\ref{sec:obstruction}) and no in each of the classes
+below.
+
+\subsection{Results}
+Throughout, $G$ is assumed \emph{axis regular}: $G$ extends to a $C^2$
+function of $(\rho^2,\zeta)$, equivalently $G=O(\rho^2)$ and
+$\partial_\rho G=O(\rho)$ as $\rho\to0$, so that $G(0,\zeta)=0$. We write
+$G=\rho^2h$ with $h$ continuous across the axis.
+
+\begin{enumerate}
+\item \textbf{Decay class} (\cref{prop:2d}). If $G\to0$ at spatial infinity
+then $G\equiv0$. The proof is a Feynman--Kac/optional-stopping argument for
+the generator $\nu\Delta_\mu-V\cdot\nabla$; the weight $\rho$ in $\Delta_\mu$
+makes the axis an entrance boundary.
+\item \textbf{Shear and zero advection} (\cref{prop:shear,prop:zeroadv}). If
+$V=(0,v(\rho))$ with $v$ bounded measurable, or if $V\cdot\nabla G\equiv0$,
+then $G\equiv0$; no periodicity, decay or mean condition on $v$ is used. In
+the zero-advection case $G=\rho^2u$ with $u$ harmonic on $\R^5$, and
+boundedness kills $u$ by a mean-value estimate.
+\item \textbf{Products} (\cref{prop:product,prop:min,prop:periodic,prop:periodicgen,prop:periodicflat}).
+For $G=\varphi(\rho)h(\zeta)$ the equation integrates along the level curves
+of $G$, which are graphs $\rho=\rho_c(\zeta)$, and reduces to the statement
+that a certain period integral $P(c)$ diverges as $c$ approaches the minimum
+of $h$. We verify this for the entire class of positive nonconstant
+$2\pi$-periodic $h\in C^2(\R)$ when $\varphi$ satisfies two one-dimensional
+tail conditions, with no hypothesis on the minima of $h$ at all.
+\end{enumerate}
+
+\subsection{The obstruction}
+The exact energy identity obtained by testing \eqref{eq:2d-intro} against
+$G/\rho$ contains a bulk term $-\int V^\rho G^2/\rho^2$ that is
+sign-indefinite, carries no gradient factor, and is not controlled by
+$\|V\|_\infty$; the surface terms are equally uncontrolled in the bounded
+class. An explicit field shows that boundedness, axis regularity and
+$G=O(\rho^2)$ alone do not suffice once \eqref{eq:wdiv-intro} is dropped
+(\cref{rem:2dopen}), and that the weighted incompressibility is what forces
+the relevant relations to hold automatically rather than by hypothesis.
+
+\section{The class and the notation}
+Let $V=(V^\rho,V^\zeta)$ be bounded on $\{\rho>0\}\times\R$ and satisfy
+\eqref{eq:wdiv-intro}; we write $\langle f\rangle_\zeta$ for a $\zeta$-mean
+wherever one is taken. A function $G\in C^2\cap L^\infty$ is axis regular if
+$G$ extends to a $C^2$ function of $(\rho^2,\zeta)$.
+
+\begin{equation}
+V\cdot\nabla G=\nu\Delta_\mu G\quad\text{on }\{\rho>0\}\times\R ,
+\end{equation}
+which is \eqref{eq:2d} below.
+
+\paragraph{The stream function form.}
+Every bounded smooth weighted-divergence-free $V$ is $V=\rho^{-1}\nabla^\perp\psi$
+with $\psi=-\rho^2W/2$ and $|W|\le\|V^\zeta\|_\infty$; the equation becomes
+\begin{equation}\label{eq:2dW-intro}
+\frac{\rho}{2}\bigl(W_\zeta G_\rho-W_\rho G_\zeta\bigr)-WG_\zeta
+=\nu\Delta_\mu G ,
+\end{equation}
+whose characteristic form is used in \S\ref{sec:products}.
+
+\section{The decay class}
+\begin{proposition}[2D lemma: the decay class]\label{prop:2d}
+Let $G\in C^2\cap L^\infty$ satisfy
+\begin{equation}\label{eq:2d}
+V\cdot\nabla G=\nu\Delta_\mu G\quad\text{on }\{\rho>0\}\times\R,
+\end{equation}
+suppose $G$ is axis regular, $G=O(\rho^2)$ as $\rho\to0$ (equivalently, $G$
+extends to a $C^2$ function of $(\rho^2,\zeta)$, i.e.\
+$G(0,\zeta)=\partial_\rho G(0,\zeta)=0$), and suppose that
+$G(x)\to0$ as $|(\rho,\zeta)|\to\infty$ in the half-plane
+$\{\rho>0\}$. Then $G\equiv0$.
+\end{proposition}
+\begin{proof}
+Let $L=\nu\Delta_\mu-V\cdot\nabla$ be the generator and $X$ a solution of the
+associated martingale problem started at $x$ (well posed because $V$ is bounded
+and the diffusion is non-degenerate). Let $\tau_S$ be the exit time of
+$B_S=\{\rho^2+\zeta^2<S^2\}$ from the half-plane $\{\rho>0\}$. Let
+$M=\|V^\zeta\|_\infty$, $\lambda=1+M/\nu$, and $f=e^{\lambda\zeta}$. Then
+$f\in C^2$ and
+\begin{equation}
+Lf=\nu\lambda^2f-\lambda V^\zeta f
+=\lambda f(\nu\lambda-V^\zeta)
+\ge\lambda\nu e^{-\lambda S}=:c_S>0
+\qquad\text{on }B_S ,
+\end{equation}
+because $\nu\lambda-V^\zeta\ge\nu$. Since $f$ is bounded on $B_S$, Dynkin's
+formula for the stopped process gives
+\begin{equation}
+\mathbb E_x\bigl[f(X_{t\wedge\tau_S})\bigr]-f(x)
+=\mathbb E_x\int_0^{t\wedge\tau_S}Lf(X_s)\,ds
+\ge c_S\,\mathbb E_x[t\wedge\tau_S].
+\end{equation}
+As $0\le f\le e^{\lambda S}$ on $B_S$,
+$\mathbb E_x[\tau_S]\le e^{\lambda S}/c_S<\infty$, hence $\tau_S<\infty$
+a.s. Since $LG=0$ and $G$ is bounded, $G(X_{t\wedge\tau_S})$ is
+a bounded martingale, and optional stopping at $\tau_S$ gives
+\begin{equation}
+G(x)=\mathbb E_x\bigl[G(X_{\tau_S})\bigr].
+\end{equation}
+At the exit point $X_{\tau_S}$ either $\rho=0$, where $G=0$ by axis regularity,
+or $|(\rho,\zeta)|=S$, where $|G|\le\varepsilon(S)$ with $\varepsilon(S)\to0$
+by hypothesis. Hence $|G(x)|\le\varepsilon(S)$ for every $S$, and letting
+$S\to\infty$ gives $G(x)=0$.
+\end{proof}
+\section{Shear fields and zero advection}
+
+\begin{proposition}[the shear class is rigid]\label{prop:shear}
+Let $V=(0,v(\rho))$ with $v$ bounded and measurable, and let
+$G\in C^2\cap L^\infty$ be axis regular with $G=O(\rho^2)$. If
+$V\cdot\nabla G=\nu\Delta_\mu G$ on $\{\rho>0\}\times\R$, then $G\equiv0$.
+No periodicity, decay at infinity, or zero mean of $v$ is used.
+\end{proposition}
+\begin{proof}
+Let $L=\nu\Delta_\mu-V\cdot\nabla$, so $LG=0$. Since $V^\rho=0$, the
+$\rho$-coordinate of the diffusion associated with $L$ is autonomous:
+\begin{equation}
+d\rho=-\frac{\nu}{\rho}\,dt+\sqrt{2\nu}\,dB_\rho ,
+\qquad
+d\zeta=-v(\rho)\,dt+\sqrt{2\nu}\,dB_\zeta .
+\end{equation}
+The martingale problem is well posed up to the exit time $\tau_0$ of the
+axis (the coefficients are locally bounded on $\{\rho>0\}$, the $\rho$-drift
+is locally Lipschitz there, the $\zeta$-drift is bounded measurable, and the
+diffusion is non-degenerate). The scale density of the $\rho$-marginal is
+\begin{equation}
+s'(\rho)=\exp\Bigl(-\int^\rho\frac{2(-\nu/r)}{2\nu}\,dr\Bigr)=\rho ,
+\end{equation}
+so $s(\rho)=\rho^2/2$. For $0<\rho_0<n$,
+\begin{equation}
+\mathbb P_{\rho_0}(\tau_0<\tau_n)
+=\frac{s(n)-s(\rho_0)}{s(n)-s(0)}
+=1-\frac{\rho_0^2}{n^2}\longrightarrow1
+\qquad(n\to\infty),
+\end{equation}
+hence $\tau_0<\infty$ a.s. Since $G$ is bounded, It\^o's formula and
+$LG=0$ make $G(X_{t\wedge\tau_0})$ a bounded martingale; optional stopping
+gives $G(x)=\mathbb E_x[G(X_{\tau_0})]$. At $\tau_0$ one has $\rho=0$ and
+$G(0,\zeta)=0$ by axis regularity, so $G(x)=0$ for every $x$.
+\end{proof}
+
+\begin{proposition}[the zero-advection class is rigid]\label{prop:zeroadv}
+Let $G\in C^2\cap L^\infty$ be axis regular with $G=O(\rho^2)$ and satisfy
+\eqref{eq:2d}. Suppose $V\cdot\nabla G\equiv0$ on $\{\rho>0\}\times\R$ (the
+advection hypothesis holds in particular when $G=F(\psi)$ and
+$V=\rho^{-1}\nabla^\perp\psi$, with $F(0)=0$). Then $G\equiv0$.
+\end{proposition}
+\begin{proof}
+The equation gives $\Delta_\mu G=0$. Write $G=\rho^2u$. The identity
+$\Delta_\mu(\rho^2u)=\rho^2\Delta_5u$ gives $\Delta_5u=0$ on
+$\{\rho>0\}$. Axis regularity makes $u=G/\rho^2$ continuous, hence locally
+bounded, across the axis; since a line in $\R^5$ is removable for locally
+bounded harmonic functions, $u$ is harmonic on all of $\R^5$ (and smooth
+there by Weyl's lemma).
+Since $|G|\le C$, we have $|u|\le C\rho^{-2}$. For $P\in\R^5$ and
+$R\ge2|P|$, the mean-value property and the integrability of $\rho^{-2}$
+near the axis (the axis is a line in $\R^5$, of codimension four, so that
+$\int_{B_R(P)}\rho^{-2}\,dx\le CR^3$) give
+\begin{equation}
+|u(P)|\le\frac{C}{|B_R|}\int_{B_R(P)}\frac{dx}{\rho^2}
+\le\frac{C'}{R^2}\longrightarrow0
+\qquad(R\to\infty).
+\end{equation}
+Hence $u\equiv0$ and $G\equiv0$.
+\end{proof}
+\section{Products: the level-set reduction}\label{sec:products}
+
+\begin{proposition}[the product class is rigid]\label{prop:product}
+Let $\varphi\in C^2([0,\infty))$ satisfy $\varphi(0)=\varphi'(0)=0$,
+$\varphi'>0$ on $(0,\infty)$, $0<\varphi<1$, and $\varphi(\rho)\to1$ as
+$\rho\to\infty$. Let $h\in C^\infty(\R)$ be bounded and strictly increasing,
+with $h(\zeta)\to H>0$ and $h'(\zeta)\to0$ as $\zeta\to\infty$, and
+$h(-\infty)<H$. Then there is no bounded $W\in C^1$ solving
+\begin{equation}\label{eq:2dW}
+\frac{\rho}{2}\bigl(W_\zeta G_\rho-W_\rho G_\zeta\bigr)-WG_\zeta
+=\nu\Delta_\mu G
+\end{equation}
+with $G=\varphi(\rho)h(\zeta)$. Consequently no bounded smooth weighted-div-free
+$V$ in this class solves $V\cdot\nabla G=\nu\Delta_\mu G$ with $G\not\equiv0$.
+\end{proposition}
+\begin{proof}
+Since $\varphi'>0$ and $h'\ne0$, $\nabla G=(\varphi'h,\varphi h')\ne0$ and the
+level sets of $G$ are non-closed arcs. Fix $c\in I:=(\max\{0,h(-\infty)\},H)$,
+so $c/H\in(0,1)$ and $\rho_*:=\varphi^{-1}(c/H)\in(0,\infty)$. The arc
+$\gamma_c=\{G=c\}$ is parametrized by $\zeta>\zeta_c$ (where $h(\zeta_c)=c$) as
+$\rho=\rho_c(\zeta):=\varphi^{-1}(c/h(\zeta))$, and
+$\rho_c(\zeta)\to\rho_*$ as $\zeta\to\infty$. Set $F=\rho^2W$. Along $\gamma_c$,
+\eqref{eq:2dW} gives
+\begin{equation}
+F'(\zeta)=2\nu\rho_c(\zeta)\Bigl(A(\rho_c(\zeta))
++k(\rho_c(\zeta))\frac{h''(\zeta)}{h(\zeta)}\Bigr),\qquad
+A=\frac{\varphi''-\varphi'/\rho}{\varphi'},\quad k=\frac{\varphi}{\varphi'}>0.
+\end{equation}
+Let $g=h'/h$. Since $h$ is bounded, increasing, $h\to H>0$ and $h'\to0$, we
+have $g\to0$, $g\in L^1$ near $+\infty$, and $g^2\le g$ eventually, so
+$g^2\in L^1$. With $B_c=2\nu\rho_c k(\rho_c)\to b_*:=2\nu\rho_*k(\rho_*)>0$ and
+$B_c'=O(g)$, integration by parts gives
+\begin{equation}
+\int_{\zeta_0}^{\zeta}B_c\frac{h''}{h}
+=\int_{\zeta_0}^{\zeta}B_c(g'+g^2)
+=[B_cg]_{\zeta_0}^{\zeta}-\int_{\zeta_0}^{\zeta}B_c'g
++\int_{\zeta_0}^{\zeta}B_cg^2=O(1).
+\end{equation}
+Since $\rho_c\to\rho_*$ and $A$ is continuous at $\rho_*>0$,
+$2\nu\rho_cA(\rho_c)\to\alpha(c):=2\nu\rho_*A(\rho_*)$; hence, by Ces\`aro
+averaging,
+\begin{equation}
+F(\zeta)=\alpha(c)\zeta+o(\zeta)+O(1).
+\end{equation}
+If $\alpha(c)=0$ for every $c\in I$, then $A\equiv0$ on the interval
+$\rho_*(I)=(\rho_{\min},\infty)$ with $\rho_{\min}\ge0$, so
+$\varphi''=\varphi'/\rho$ and $\varphi'=K\rho$ there; then
+$\varphi=K\rho^2/2+C$ on that interval, and boundedness with $0<\varphi<1$ and
+$\varphi\to1$ forces $K=0$ and $\varphi\equiv1$ there, a contradiction. Hence
+there is $c\in I$ with $\alpha(c)\ne0$. For this $c$,
+$F(\zeta)=\alpha(c)\zeta+o(\zeta)\to\pm\infty$. Since
+$\rho_c(\zeta)\to\rho_*\in(0,\infty)$, we get $|W|=|F|/\rho_c^2\to\infty$,
+contradicting the boundedness of $W$.
+
+Finally, if $V$ is bounded, smooth and weighted divergence-free, then
+$\psi=\int_0^\rho rV^\zeta(r,\zeta)\,dr$ and $W=-2\psi/\rho^2$ give a bounded
+$C^1$ solution of \eqref{eq:2dW}; so no such $V$ solves
+$V\cdot\nabla G=\nu\Delta_\mu G$ with $G$ in this class.
+\end{proof}
+
+\begin{proposition}[product class with a nondegenerate minimum]\label{prop:min}
+Let $\nu>0$ and let $\varphi\in C^2([0,\infty))$ satisfy
+$\varphi(0)=\varphi'(0)=0$,
+$\varphi'>0$ on $(0,\infty)$, $0<\varphi<1$, and $\varphi(\rho)\to1$ as
+$\rho\to\infty$. Let $h\in C^2(\R)$ be positive with a nondegenerate minimum at
+$\zeta_0$: $h'(\zeta_0)=0$, $\beta:=h''(\zeta_0)>0$, $m:=h(\zeta_0)>0$. Then no
+bounded smooth weighted-div-free $V$ solves $V\cdot\nabla G=\nu\Delta_\mu G$
+with $G=\varphi(\rho)h(\zeta)$ and $G\not\equiv0$; in fact, there is no
+$W\in C^1$ with $W$, $\rho W_\rho$, $\rho W_\zeta$ bounded solving
+\eqref{eq:2dW}.
+\end{proposition}
+\begin{proof}
+Let $W\in C^1$ with $W,\rho W_\rho,\rho W_\zeta$ bounded solve
+\eqref{eq:2dW}; a bounded smooth weighted-div-free $V$ yields such a $W$ by the
+representation at the end of the proof of \cref{prop:product}. Put
+$V^\rho=\rho W_\zeta/2$.
+At $\zeta=\zeta_0$ we have $G_\zeta=\varphi h'=0$ and $G_\rho=\varphi'h>0$.
+Equation \eqref{eq:2dW} gives
+\begin{equation}
+V^\rho=\frac{\rho}{2}W_\zeta
+=\nu\frac{\Delta_\mu G}{G_\rho}
+=\nu\Bigl(A(\rho)+k(\rho)\frac{h''(\zeta_0)}{h(\zeta_0)}\Bigr),
+\quad A=\frac{\varphi''-\varphi'/\rho}{\varphi'},\quad
+k=\frac{\varphi}{\varphi'}>0.
+\end{equation}
+Set $\omega^2=\beta/m>0$. Since $V^\rho$ is bounded, there is $C$ with
+\begin{equation}
+\Bigl|\frac{\varphi''-\varphi'/\rho}{\varphi'}
++\omega^2\frac{\varphi}{\varphi'}\Bigr|\le C,
+\end{equation}
+hence $|\varphi''-\varphi'/\rho+\omega^2\varphi|\le C\varphi'$ and therefore
+\begin{equation}
+\varphi''+\omega^2\varphi\le\Bigl(C+\frac1\rho\Bigr)\varphi'.
+\end{equation}
+Integrating from $\rho_0>0$ to $R$,
+\begin{equation}
+\varphi'(R)\le\varphi'(\rho_0)+C\bigl(\varphi(R)-\varphi(\rho_0)\bigr)
++\int_{\rho_0}^R\frac{\varphi'}{\rho}\,d\rho
+-\omega^2\int_{\rho_0}^R\varphi\,d\rho .
+\end{equation}
+The first three terms on the right are bounded: $\varphi$ is bounded,
+$\varphi'\in L^1(0,\infty)$ because $\varphi$ is bounded and increasing, and
+$\varphi'/\rho$ is integrable near $0$ (as $\varphi'(0)=0$ and
+$\varphi\in C^2$) and bounded by $\varphi'$ for $\rho\ge1$. Since
+$\varphi\to1$, the last term tends to $-\infty$, so $\varphi'(R)<0$ for large
+$R$, contradicting $\varphi'>0$. This rules out every such $W$ and hence, by
+the representation, every bounded smooth weighted-div-free $V$. The sign
+$\omega^2=\beta/m>0$ is
+essential: at a nondegenerate maximum the decisive term in the integrated
+inequality flips sign, and this argument gives no contradiction.
+\end{proof}
+
+\begin{remark}[periodic level graphs and the period integral]\label{rem:drift}
+For $2\pi$-periodic $h$ and $c<\min h$ the level graph
+$\rho_c(\zeta)=\varphi^{-1}(c/h(\zeta))$ is
+periodic in $\zeta$ but is not a closed curve in the plane, so the closed-loop
+identity \eqref{eq:2dfredholm} does not apply; the period integral $P(c)$
+defined below need not vanish. Set
+$F(\zeta)=\rho_c(\zeta)^2W(\rho_c(\zeta),\zeta)$. For
+$\varphi=\rho^2/(1+\rho^2)$ and $h=1+\varepsilon\cos\zeta$, $0<\varepsilon<1$,
+a direct computation gives
+\begin{equation}
+F'=\nu c\Bigl(\frac{h''}{(h-c)^2}-\frac{8}{h}\Bigr),\qquad
+P(c):=\int_0^{2\pi}F'\,d\zeta
+=2\pi\nu c\Bigl(\frac{\varepsilon^2}{((1-c)^2-\varepsilon^2)^{3/2}}
+-\frac{8}{\sqrt{1-\varepsilon^2}}\Bigr).
+\end{equation}
+Thus $P(c)$ is not identically zero (the bracket is nonconstant in $c$, and
+$P(c)\to+\infty$ as $c\uparrow1-\varepsilon$). If a bounded $W$ existed, then
+$F=\rho_c^2W$ would be bounded on the periodic level graph and
+$F(\zeta+2\pi n)=F(\zeta)+nP(c)$ for every $n$, so $P(c)=0$ for every
+$c<\min h$, a contradiction. Explicitly, for every $c$ with $P(c)\neq0$ the formal solution
+$W=[\int_0^\zeta R(G,s)\,ds+H(G)]/\rho^2$, with
+$R(c,s)=2\nu\rho_c(s)[A(\rho_c(s))+k(\rho_c(s))h''(s)/h(s)]$, grows linearly in
+$\zeta$ along that level graph. In particular, for $h=1+\varepsilon\cos\zeta$
+the minimum at $\zeta_0=\pi$ has $m=1-\varepsilon>0$ and $\beta=\varepsilon>0$,
+so \cref{prop:min} applies for every $\varphi$ satisfying its hypotheses. The
+period integral gives a second, explicit proof in this example. Periodicity is
+assumed in this remark and in \cref{prop:periodic}; \cref{prop:min} does not
+use it.
+\end{remark}
+
+\section{Periodic products}
+\begin{proposition}[the periodic product class for $\varphi_1$]\label{prop:periodic}
+Let $\nu>0$, $\varphi=\varphi_1=\rho^2/(1+\rho^2)$, and let $h\in C^2(\R)$ be
+positive and $2\pi$-periodic. Then there is no bounded $W\in C^1$ solving
+\eqref{eq:2dW} with $G=\varphi_1(\rho)h(\zeta)$; consequently no bounded smooth
+weighted-div-free $V$ solves $V\cdot\nabla G=\nu\Delta_\mu G$ with this $G$ and
+$G\not\equiv0$.
+\end{proposition}
+\begin{proof}
+First suppose $h$ is constant. For $c\in(0,h)$ the level graph
+$\rho_c\equiv\sqrt{c/(h-c)}$ is a circle. Since $G_\zeta=0$, \eqref{eq:2dW}
+gives $(\rho/2)W_\zeta G_\rho=\nu\Delta_\mu G$, hence
+$W_\zeta=2\nu\Delta_\mu G/(\rho G_\rho)=-8\nu/(1+\rho^2)$ and
+$F'=\rho_c^2W_\zeta=-8\nu c/h$, a nonzero constant; then
+$F(\zeta+2\pi n)=F(\zeta)-16\pi\nu c n/h$ for every $n$, so a bounded $W$ is
+impossible.
+
+Now suppose $h$ is nonconstant, and put $m=\min h$, $M=\max h$, so
+$0<m<M$. Fix $c\in(0,m)$, set $\delta=m-c$ and $u=h-c>0$. The level graph
+$\rho_c(\zeta)=\sqrt{c/u(\zeta)}$ is $2\pi$-periodic and satisfies
+$\varphi_1(\rho_c)h=c$. Set $F(\zeta)=\rho_c(\zeta)^2W(\rho_c(\zeta),\zeta)$.
+Along this graph, \eqref{eq:2dW} gives
+\begin{equation}
+F'=2\nu\rho_c\Bigl(A(\rho_c)+k(\rho_c)\frac{h''}{h}\Bigr),
+\qquad A=\frac{\varphi_1''-\varphi_1'/\rho}{\varphi_1'},\quad
+k=\frac{\varphi_1}{\varphi_1'}>0.
+\end{equation}
+For $\varphi_1$ one has $A=-4\rho/(1+\rho^2)$ and
+$k=\rho(1+\rho^2)/2$; since $\rho_c^2=c/u$ and
+$1+\rho_c^2=h/u$, this becomes
+\begin{equation}\label{eq:periodicF}
+F'=\nu c\Bigl(\frac{h''}{(h-c)^2}-\frac8h\Bigr)=:f(\zeta),
+\end{equation}
+which is $2\pi$-periodic. Let $P(c)=\int_0^{2\pi}f\,d\zeta$. Since $u=h-c$ is
+positive, $2\pi$-periodic and $C^2$, integration by parts on the circle gives
+\begin{equation}\label{eq:periodicI}
+I(c):=\int_0^{2\pi}\frac{h''}{(h-c)^2}\,d\zeta
+=2\int_0^{2\pi}\frac{(h')^2}{(h-c)^3}\,d\zeta\ge0,
+\end{equation}
+so
+\begin{equation}
+P(c)=\nu c\,I(c)-8\nu c\int_0^{2\pi}\frac{d\zeta}{h(\zeta)}.
+\end{equation}
+The second term is bounded: $h\ge m$ gives
+$8\nu c\int_0^{2\pi}d\zeta/h\le16\pi\nu$. To bound $I(c)$ from below, put
+$\psi=u^{-1/2}\in C^1$. Then $\psi'=-\frac12h'u^{-3/2}$, hence
+$I(c)=8\int_0^{2\pi}(\psi')^2\,d\zeta$. The function $u$ ranges over
+$[\delta,M-m+\delta]$, so the oscillation of $\psi=u^{-1/2}$ is
+\begin{equation}
+\operatorname{osc}\psi=\delta^{-1/2}-(M-m+\delta)^{-1/2}.
+\end{equation}
+For $\delta\le(M-m)/3$ this is at least $\delta^{-1/2}/2$. The Poincar\'e
+inequality on the circle,
+$\int_0^{2\pi}(\psi')^2\ge(\operatorname{osc}\psi)^2/(2\pi)$, gives
+\begin{equation}
+I(c)\ge\frac{\delta^{-1}}{\pi}.
+\end{equation}
+Therefore
+\begin{equation}
+P(c)\ge\frac{\nu c}{\pi\delta}-16\pi\nu\longrightarrow+\infty
+\qquad(c\uparrow m).
+\end{equation}
+Choose $c<m$ with $P(c)>0$. If a bounded $W$ existed, then
+$F=\rho_c^2W$ would be bounded, because
+$\rho_c^2=c/(h-c)\le c/\delta$, and $2\pi$-periodic; but $f$ is
+$2\pi$-periodic, so $F(\zeta+2\pi n)=F(\zeta)+nP(c)$ for every $n$, which is
+unbounded. This contradiction rules out every bounded $W$. The passage to $V$
+is the representation at the end of the proof of \cref{prop:product}.
+\end{proof}
+
+\begin{proposition}[saturating periodic products with finite-order minima]\label{prop:periodicgen}
+Let $\nu>0$, and let $\varphi\in C^2([0,\infty))$ satisfy
+$\varphi(0)=\varphi'(0)=0$, $\varphi'>0$ on $(0,\infty)$, $0<\varphi<1$, and
+$\varphi(\rho)\to1$ as $\rho\to\infty$. Put $\varepsilon=1-\varphi$ and
+\begin{equation}
+A=\frac{\varphi''-\varphi'/\rho}{\varphi'},\qquad k=\frac{\varphi}{\varphi'}>0 .
+\end{equation}
+Let $K\ge1$ be an integer, and let $h\in C^{2K+1}(\R)$ be positive and
+$2\pi$-periodic, with finitely many global minima $m=h(\zeta_i)$,
+$i=0,\dots,N$, each of exact order $2K_i$ with $1\le K_i\le K$, and at least
+one of them of order $2K$:
+\begin{equation}
+h(\zeta_i+s)=m+a_i|s|^{2K_i}+O(|s|^{2K_i+1}),\qquad a_i>0 .
+\end{equation}
+Put $\theta=1/(2K)$, and assume there are $\rho_0\ge0$ and a nondecreasing
+$g:[\rho_0,\infty)\to[0,\infty)$ with $(\rho A(\rho))_-\le g(\rho)$ and
+\begin{equation}\label{eq:Htheta}
+\int_{\rho_0}^{\infty}g(\rho)\,
+\varepsilon(\rho)^{\theta-1}\varphi'(\rho)\,d\rho<\infty .
+\end{equation}
+Let $\rho_c(\zeta):=\varphi^{-1}(c/h(\zeta))$ and
+\begin{equation}
+P(c):=2\nu\int_0^{2\pi}\rho_c\Bigl(A(\rho_c)+k(\rho_c)\frac{h''}{h}\Bigr)d\zeta .
+\end{equation}
+Then $P(c)\to+\infty$ as $c\uparrow m$. Consequently there is no bounded
+$W\in C^1$ solving \eqref{eq:2dW} with $G=\varphi(\rho)h(\zeta)$, and no
+bounded smooth weighted-divergence-free $V$ solves
+$V\cdot\nabla G=\nu\Delta_\mu G$ with this $G$.
+\end{proposition}
+\begin{proof}
+The function $\varphi$ is strictly increasing from $0$ to $1$, so
+$\Phi:=\varphi^{-1}$ is well defined on $(0,1)$. Put
+$\varepsilon(\rho)=1-\varphi(\rho)$ and $r(\varepsilon)=\Phi(1-\varepsilon)$.
+Let $m=\min h$, $M=\max h$, fix $c=m-\delta$ with
+$0<\delta<\min(m/2,(M-m)/3)$, and set
+\begin{equation}
+\rho_c(\zeta)=\Phi\Bigl(\frac{c}{h(\zeta)}\Bigr).
+\end{equation}
+Then $G(\rho_c(\zeta),\zeta)=c$, and $\rho_c$ is $2\pi$-periodic. By the
+computation in the proof of \cref{prop:product}, along this level graph
+\begin{equation}\label{eq:Pgen}
+P(c):=\int_0^{2\pi}F'\,d\zeta
+=2\nu\int_0^{2\pi}\rho_c\Bigl(A(\rho_c)+k(\rho_c)\frac{h''}{h}\Bigr)d\zeta
+=:I_1(c)+I_2(c),
+\end{equation}
+where $F(\zeta)=\rho_c(\zeta)^2W(\rho_c(\zeta),\zeta)$.
+
+\emph{Step 1: $I_2(c)\to+\infty$.}  Choose a global minimum $\zeta_0$ of
+maximal order $2K$.  Fix $\zeta_1>0$ so small that the intervals
+$(\zeta_i-\zeta_1,\zeta_i+\zeta_1)$, $i=0,\dots,N$, are disjoint and
+$\eta:=\min\{h(\zeta)-m:\ |\zeta-\zeta_i|\ge\zeta_1\ \text{for all }i\}>0$.
+Then off the union of these intervals $h-c\ge\eta$, $\rho_c$ stays in a fixed
+compact interval and the contribution is $O(1)$ uniformly in $c$.  The
+remaining intervals $|\zeta-\zeta_i|<\zeta_1$, $i\ge1$, contribute a
+nonnegative amount, since there $h''/h\ge c|\zeta-\zeta_i|^{2K_i-2}\ge0$.
+Put
+$W_{1,i}:=\max_{|s|\le\zeta_1}(h(\zeta_i+s)-m)$ and $W_1:=W_{1,0}$.  On
+$|\zeta-\zeta_0|<\zeta_1$ the expansion of $h$ gives
+$h''(\zeta)/h(\zeta)\ge c_0|\zeta-\zeta_0|^{2K-2}$.  Put
+$w=h-c\in[\delta,W_1+\delta]$, and note that in the estimates below the
+integration range may be restricted to $w\le W_1$, all integrands being of one
+sign.  Put $\varepsilon=w/(c+w)$; then
+$\rho_c=r(\varepsilon)$ and
+\begin{equation}
+\rho_c k(\rho_c)=\varphi(\rho_c)\frac{\rho_c}{\varphi'(\rho_c)}
+=\varphi(\rho_c)\Psi(\varepsilon),\qquad
+\Psi(\varepsilon):=\frac{r(\varepsilon)}{\varphi'(r(\varepsilon))}>0 .
+\end{equation}
+Since $\varphi(\rho_c)=c/h\ge c/M\ge m/(2M)>0$ for $c>m/2$, and since on each
+side of $\zeta_0$ one has
+$|\zeta-\zeta_0|^{2K-2}d\zeta
+=(2K)^{-1}a^{\theta-1}(1+O(|\zeta-\zeta_0|))(w-\delta)^{-\theta}dw$, we get
+\begin{equation}
+I_2(c)\ge C\int_{\delta}^{W_1}\Psi\Bigl(\frac{w}{c+w}\Bigr)
+(w-\delta)^{-\theta}\,dw-C_1
+\end{equation}
+with $C>0$ and $C_1\ge0$ independent of $c$.  On $w\ge2\delta$ we have
+$(w-\delta)^{-\theta}\ge2^{-\theta}w^{-\theta}$; applying Fatou's lemma as
+$\delta\downarrow0$,
+\begin{equation}
+\liminf_{c\uparrow m}I_2(c)\ge
+C2^{-\theta}\int_0^{W_1}\Psi\Bigl(\frac{w}{m+w}\Bigr)w^{-\theta}\,dw .
+\end{equation}
+The substitution $w=mv/(1-v)$ gives $dw=m(1-v)^{-2}dv$ and
+\begin{equation}
+\int_0^{W_1}\Psi\Bigl(\frac{w}{m+w}\Bigr)w^{-\theta}dw
+=m^{1-\theta}\int_0^{v_1}\Psi(v)v^{-\theta}(1-v)^{\theta-2}dv .
+\end{equation}
+Since $(1-v)^{\theta-2}\ge c_3>0$ on $[0,v_1]$, and since
+$\Psi(v)\,dv=\bigl(r(v)/\varphi'(r(v))\bigr)d\varepsilon=-r(v)\,d\rho$
+with $d\varepsilon=-\varphi'(\rho)\,d\rho$, we obtain
+\begin{equation}
+\int_0^{v_1}\Psi(v)v^{-\theta}dv
+=\int_{r(v_1)}^{\infty}\rho\,\varepsilon(\rho)^{-\theta}\,d\rho=+\infty,
+\end{equation}
+because $\varepsilon(\rho)\to0$ while $\rho\ge r(v_1)>0$.  Hence
+$I_2(c)\to+\infty$.
+
+\emph{Step 2: $I_1$ is bounded below.}  With $\eta$ as in Step 1, for
+$\delta<\eta/2$ one has $h-c\ge\eta/2$ off the union of the intervals
+$(\zeta_i-\zeta_1,\zeta_i+\zeta_1)$, so the contribution to $I_1$ there is
+$O(1)$.  Near a minimum $\zeta_i\ne\zeta_0$ of order $2K_i$ the same change of
+variables carries the weight $(w-\delta)^{\theta_i-1}$ with
+$\theta_i=1/(2K_i)\ge\theta$; since $\varepsilon^{\theta_i-1}\le
+\varepsilon^{\theta-1}$ for $0<\varepsilon<1$, \eqref{eq:Htheta} bounds the
+negative part of that contribution by the argument below with $\theta_i$ in
+place of $\theta$.  It therefore suffices to treat $\zeta_0$.  Shrinking
+$\zeta_1$ (hence all the $W_{1,i}$) if necessary, assume in addition that
+$\Phi(m/(m+W_{1,i}))\ge\rho_0$ for every $i$; then for each $i$ and every
+$0<w<W_{1,i}$ the point $\rho_m(w)$ below lies in $[\rho_0,\infty)$.  With
+$W_1=W_{1,0}$ one has
+$\rho_c=\Phi(c/(c+w))\ge\Phi(c/(c+W_1))\to\Phi(m/(m+W_1))$ and
+$\rho_m(w)\ge\Phi(m/(m+W_1))$, so for $c$ sufficiently close to $m$ every
+argument of $g$ below lies in $[\rho_0,\infty)$.  On
+$|\zeta-\zeta_0|<\zeta_1$ the change of variables above, which for the
+$A$-term carries no extra factor $h''/h$, gives
+\begin{equation}
+I_1(c)\ge -C\int_\delta^{W_1}
+\bigl(\rho_c A(\rho_c)\bigr)_- (w-\delta)^{\theta-1}\,dw+O(1).
+\end{equation}
+For $c\le m$ one has
+\begin{equation}
+\frac{c}{c+w}\le\frac{m}{m+w},
+\qquad\text{hence}\qquad
+\rho_c\le \rho_m(w):=\Phi\Bigl(\frac{m}{m+w}\Bigr).
+\end{equation}
+Since $g$ is nondecreasing and $(\rho A)_-\le g$,
+\begin{equation}
+\bigl(\rho_c A(\rho_c)\bigr)_-\le g(\rho_c)\le g(\rho_m(w)).
+\end{equation}
+Therefore
+\begin{equation}
+\int_\delta^{W_1}\bigl(\rho_c A(\rho_c)\bigr)_-(w-\delta)^{\theta-1}dw
+\le\int_\delta^{W_1}g(\rho_m(w))(w-\delta)^{\theta-1}dw .
+\end{equation}
+Split the last integral at $2\delta$.  On $(2\delta,W_1)$ one has
+$(w-\delta)^{\theta-1}\le2^{1-\theta}w^{\theta-1}$, and
+\eqref{eq:Htheta} together with the substitution $w=mv/(1-v)$,
+$v=\varepsilon(\rho_m(w))=w/(m+w)$ shows that $g(\rho_m(w))w^{\theta-1}$ is
+integrable on $(0,W_1)$: indeed $dw=m(1-v)^{-2}dv$,
+$w^{\theta-1}=(mv/(1-v))^{\theta-1}$ and $(1-v)^{-1-\theta}\le C$ on
+$[0,v_1]$, so the integral is at most
+$C\int_0^{v_1}g(r(v))v^{\theta-1}dv
+=C\int g(\rho)\varepsilon(\rho)^{\theta-1}\varphi'(\rho)\,d\rho<\infty$
+by \eqref{eq:Htheta}.  Hence this part is at most the full integral
+$\int_0^{W_1}g(\rho_m(w))w^{\theta-1}dw$, which is finite, and in particular
+it is bounded uniformly in $\delta$.  On $(\delta,2\delta)$, with
+$u=w-\delta\in(0,\delta)$
+and $\varepsilon_\delta:=\delta/(m+\delta)$,
+\begin{equation}
+\int_\delta^{2\delta}g(\rho_m(w))(w-\delta)^{\theta-1}dw
+\le g\bigl(\Phi(1-\varepsilon_\delta)\bigr)\frac{\delta^\theta}{\theta}
+\le C\,\varepsilon_\delta^{\theta}g\bigl(\Phi(1-\varepsilon_\delta)\bigr),
+\end{equation}
+so this part tends to $0$ provided
+$G(\varepsilon):=g(\Phi(1-\varepsilon))$ satisfies
+$G(\varepsilon)\varepsilon^{\theta}\to0$.  Since $g$ is nondecreasing, $G$ is
+nonincreasing, and \eqref{eq:Htheta} says
+$\int_0G(\varepsilon)\varepsilon^{\theta-1}d\varepsilon<\infty$; hence
+\begin{equation}
+G(\varepsilon)\varepsilon^{\theta}
+\le\frac{\theta}{1-2^{-\theta}}
+\int_{\varepsilon/2}^{\varepsilon}G(s)s^{\theta-1}\,ds
+\longrightarrow0
+\qquad(\varepsilon\downarrow0).
+\end{equation}
+Therefore
+\begin{equation}
+\sup_{0<\delta<\delta_0}
+\int_\delta^{W_1}g(\rho_m(w))(w-\delta)^{\theta-1}dw<\infty .
+\end{equation}
+Thus $I_1(c)$ is bounded below uniformly in $c$.
+
+Combining the two steps with \eqref{eq:Pgen} gives $P(c)\to+\infty$ as
+$c\uparrow m$.  In particular $P(c)>0$ for all $c$ sufficiently close to
+$m$.  If a bounded $W\in C^1$ existed, then
+$|F|\le\Phi(c/m)^2\|W\|_\infty$ would be bounded, while the $2\pi$-periodicity
+of the integrand $F'$ in \eqref{eq:Pgen} gives
+$F(\zeta+2\pi n)=F(\zeta)+nP(c)$ for every $n$; this is impossible when
+$P(c)\neq0$.  The passage to a bounded weighted-divergence-free $V$ is the
+same as at the end of the proof of \cref{prop:product}.
+\end{proof}
+
+\begin{remark}[explicit classes in \cref{prop:periodicgen}]\label{rem:periodicgen}
+Condition \eqref{eq:Htheta} holds whenever $(\rho A)_-$ is bounded, since
+then $g$ may be taken constant and
+$\int_{\rho_0}^\infty\varepsilon^{\theta-1}\varphi'\,d\rho
+=\int_0^{\varepsilon(\rho_0)}\varepsilon^{\theta-1}\,d\varepsilon<\infty$
+(as $\theta>0$).
+Condition \eqref{eq:Htheta} is sufficient, not necessary.
+This covers $\varphi_1$ (for which $\rho A=-4\rho^2/(1+\rho^2)\to-4$) and
+every admissible $\varphi$ with $1-\varphi\sim C\rho^{-p}$ as $\rho\to\infty$
+(for instance $\varphi_p=1-(1+\rho^2)^{-p/2}$), for which $\rho A\to-(p+2)$.  It also covers profiles for which $(\rho A)_-$ grows at
+most polynomially while $\varepsilon$ decays faster than any power, such as
+$\varphi=1-e^{-\kappa\rho}(1+\kappa\rho)$ (with $A\equiv-\kappa$) and
+stretched-exponential tails $\varepsilon\sim e^{-\rho^\alpha}$ with
+$\alpha\ge2$ (for $0<\alpha<2$ one first modifies the profile near $\rho=0$,
+which is not $C^2$ there, leaving the tail and \eqref{eq:Htheta} unchanged).
+The periodic product class for an arbitrary admissible $\varphi$ remains
+open; \cref{prop:periodicflat} extends the conclusion to a different, partly
+overlapping class of profiles, with no hypothesis on $h$ beyond $C^2$.
+\end{remark}
+
+\begin{proposition}[saturating periodic products: $C^2$ data]\label{prop:periodicflat}
+Let $\nu>0$, and let $\varphi\in C^2([0,\infty))$ satisfy
+$\varphi(0)=\varphi'(0)=0$, $\varphi'>0$ on $(0,\infty)$, $0<\varphi<1$, and
+$\varphi(\rho)\to1$ as $\rho\to\infty$. With $\Phi=\varphi^{-1}$ put
+\begin{equation}
+\varepsilon=1-\varphi,\qquad r(\varepsilon)=\Phi(1-\varepsilon),\qquad
+\Psi(\varepsilon)=\frac{r(\varepsilon)}{\varphi'(r(\varepsilon))},
+\end{equation}
+and, with $A=(\varphi''-\varphi'/\rho)/\varphi'$,
+\begin{equation}
+\mathcal W(\varepsilon):=(1-\varepsilon)\Psi(\varepsilon),\qquad
+\mathcal A(\varepsilon):=\bigl(\rho A(\rho)\bigr)_-\big|_{\rho=r(\varepsilon)}
+\end{equation}
+(so that $\mathcal W(\varepsilon)=\rho k(\rho)$ at $\rho=r(\varepsilon)$). Assume
+\begin{enumerate}
+\item[(i)] there are $\eta\in(0,2]$, $\varepsilon_1\in(0,1)$ and $C\ge0$ with
+$\mathcal A(\varepsilon)\le C\bigl(1+\log\frac1\varepsilon\bigr)^{2-\eta}$
+for $0<\varepsilon<\varepsilon_1$;
+\item[(ii)] there are $\varepsilon_0\in(0,1)$, $c_*>0$ and $q\in[0,\eta)$
+(with $\eta$ from (i)) with
+$\mathcal W'(\varepsilon)\le-c_*\varepsilon^{-2}\bigl(\log\frac1\varepsilon\bigr)^{-q}$
+for $0<\varepsilon<\varepsilon_0$ (differentiability of $\mathcal W$ being
+automatic).
+\end{enumerate}
+Then for every positive nonconstant $2\pi$-periodic $h\in C^2(\R)$, with
+$m=\min h$, $\rho_c=\Phi(c/h)$ and
+\begin{equation}
+P(c)=2\nu\int_0^{2\pi}\rho_c\Bigl(A(\rho_c)+k(\rho_c)\frac{h''}{h}\Bigr)d\zeta,
+\end{equation}
+one has $P(c)\to+\infty$ as $c\uparrow m$. Consequently there is no bounded
+$W\in C^1$ solving \eqref{eq:2dW} with $G=\varphi(\rho)h(\zeta)$, and no
+bounded smooth weighted-divergence-free $V$ solves
+$V\cdot\nabla G=\nu\Delta_\mu G$ with this $G$.
+\end{proposition}
+\begin{proof}
+Since $\varphi\in C^2$ and $\varphi'>0$ on $(0,\infty)$, $\Phi\in C^2((0,1))$
+and $\mathcal W\in C^1((0,1))$. Let $m=\min h$, $M=\max h$, and fix
+$c=m-\delta$ with $0<\delta<\min(m/2,(M-m)/2)$. Put
+\begin{equation}
+w=h-c\in[\delta,M-m+\delta],\qquad
+\varepsilon(\zeta)=\frac{w(\zeta)}{h(\zeta)}=1-\frac ch,\qquad
+\rho_c(\zeta)=r(\varepsilon(\zeta))=\Phi\Bigl(\frac{c}{h(\zeta)}\Bigr).
+\end{equation}
+Then $G(\rho_c(\zeta),\zeta)=c$, and by the computation in the proof of
+\cref{prop:product}, $P=I_1+I_2$ with
+\begin{equation}
+I_1=2\nu\int_0^{2\pi}\rho_cA(\rho_c)\,d\zeta,\qquad
+I_2=2\nu\int_0^{2\pi}\rho_ck(\rho_c)\frac{h''}{h}\,d\zeta .
+\end{equation}
+\emph{The $A$-term.}  Since $c\le h\le M$ and $h-c=w\ge\delta$, one has
+$\varepsilon(\zeta)=w/h\ge\delta/M$ for every $\zeta$, hence
+$\rho_c(\zeta)\le r(\delta/M)$.  By (i),
+$\mathcal A(\varepsilon(\zeta))\le C(1+\log(M/\delta))^{2-\eta}$ on the set
+$\{\varepsilon<\varepsilon_1\}$; on its complement $\varepsilon$ lies in the
+compact subinterval $[\varepsilon_1,1-m/(2M)]$ of $(0,1)$ (here $c\ge m/2$,
+since $\delta<m/2$), where $\mathcal A$ is continuous and hence bounded.
+Enlarging $C$ if necessary,
+\begin{equation}
+\bigl(\rho_cA(\rho_c)\bigr)_-\le C\Bigl(1+\log\frac M\delta\Bigr)^{2-\eta}
+\qquad\text{for every }\zeta,
+\end{equation}
+and therefore $I_1\ge-4\pi\nu C(1+\log(M/\delta))^{2-\eta}$.
+
+\emph{The curvature term.}  Since $\varphi(\rho_c)=c/h=1-\varepsilon$,
+\begin{equation}
+\rho_ck(\rho_c)=\varphi(\rho_c)\frac{r(\varepsilon)}{\varphi'(r(\varepsilon))}
+=(1-\varepsilon)\Psi(\varepsilon)=\mathcal W(\varepsilon).
+\end{equation}
+Put $v=\log h$, so that $h''/h=v''+(v')^2$ and $v'=h'/h$. The map
+$\mathcal W(\varepsilon(\cdot))$ is $C^1$, and $v'$ is $2\pi$-periodic; hence so
+is the product $\mathcal W(\varepsilon(\cdot))v'$, and integration by parts on
+the circle gives
+\begin{equation}
+\int_0^{2\pi}\mathcal W(\varepsilon)v''\,d\zeta
+=-\int_0^{2\pi}\mathcal W'(\varepsilon)\varepsilon'v'\,d\zeta,
+\end{equation}
+and the second contribution,
+$2\nu\int_0^{2\pi}\mathcal W(\varepsilon)(v')^2d\zeta$, is nonnegative because
+$\mathcal W>0$. Now $\varepsilon'=ch'/h^2$, hence
+$\varepsilon'v'=c(h')^2/h^3\ge0$. Let
+$E=\{\zeta:\varepsilon(\zeta)<\varepsilon_0\}$. On $E$ one has
+$\varepsilon\ge\delta/M$, hence $\log\frac1\varepsilon\le\log\frac M\delta$ and
+condition (ii) gives
+\begin{equation}
+-\mathcal W'(\varepsilon)\varepsilon'v'\ge
+c_*\Bigl(\log\frac M\delta\Bigr)^{-q}
+c\,\varepsilon^{-2}\frac{(h')^2}{h^3}.
+\end{equation}
+Since $m\le h\le M$ and $h'\equiv w'$, we have $\varepsilon=w/h\le w/m$, so
+$\varepsilon^{-2}\ge m^2/w^2$, and $(h')^2/h^3\ge(w')^2/M^3$; therefore
+\begin{equation}
+-\mathcal W'(\varepsilon)\varepsilon'v'\ge\frac{c_*cm^2}{M^3}
+\Bigl(\log\frac M\delta\Bigr)^{-q}\bigl((\log w)'\bigr)^2
+\qquad\text{on }E .
+\end{equation}
+Off $E$ one has $\varepsilon\in[\varepsilon_0,1-c/M]$, where $\mathcal W'$ and
+$\varepsilon'v'$ are bounded, so there is $C_1$ with
+\begin{equation}
+I_2\ge\frac{2\nu c_*cm^2}{M^3}\Bigl(\log\frac M\delta\Bigr)^{-q}
+\int_E\bigl((\log w)'\bigr)^2d\zeta-C_1 .
+\end{equation}
+By Cauchy--Schwarz,
+\begin{equation}
+\int_E\bigl((\log w)'\bigr)^2d\zeta
+\ge\frac1{2\pi}\Bigl(\int_E\bigl|(\log w)'\bigr|d\zeta\Bigr)^2
+=\frac1{2\pi}\bigl(\operatorname{TV}_E\log w\bigr)^2 .
+\end{equation}
+Now $E=\{\varepsilon<\varepsilon_0\}=\{w<\kappa\}$ with
+$\kappa=\varepsilon_0c/(1-\varepsilon_0)>0$, so $E$ contains a neighbourhood of
+the set of global minima of $h$. Let $\zeta_0$ be a global minimum and put
+$\eta_0:=\tfrac12\min\{\kappa,M-m+\delta\}>0$. Since
+$\max w=M-m+\delta\ge2\eta_0$, one may move from $\zeta_0$ towards a point
+where $w$ is maximal until $w$
+first reaches $\eta_0$; on the way $w<\eta_0<\kappa$, so the path lies in $E$
+and carries
+$\log w$ from $\log\delta$ to $\log\eta_0$; hence
+$\operatorname{TV}_E\log w\ge\log(\eta_0/\delta)$. Therefore, for
+$\delta<\kappa/2$,
+\begin{equation}
+P(c)\ge\frac{\nu c_*cm^2}{\pi M^3}
+\Bigl(\log\frac M\delta\Bigr)^{-q}\log^2\frac{\eta_0}{\delta}
+-4\pi\nu C\Bigl(1+\log\frac M\delta\Bigr)^{2-\eta}-C_1
+\longrightarrow+\infty\qquad(c\uparrow m),
+\end{equation}
+because $\eta_0\ge\tfrac12\min\{\kappa,M-m\}\ge
+\tfrac12\min\{\varepsilon_0m/(2(1-\varepsilon_0)),M-m\}>0$ for $c\ge m/2$ is
+bounded below independently of $\delta$, so that
+$\log(\eta_0/\delta)\ge\tfrac12\log(M/\delta)$ for small $\delta$: with
+$\Lambda=\log(M/\delta)$ the first term is at least
+$(\nu c_*cm^2/4\pi M^3)\Lambda^{2-q}$, the second is $O(\Lambda^{2-\eta})$,
+and $q<\eta$.
+
+Choose then $c<m$ with $P(c)>0$. For this fixed $c$ one has
+$\rho_c\le\Phi(c/m)<\infty$; hence if a bounded $W\in C^1$ solved
+\eqref{eq:2dW}, then $F=\rho_c^2W(\rho_c,\cdot)$ would be bounded, while the
+$2\pi$-periodicity of the integrand $F'$ would give
+$F(\zeta+2\pi n)=F(\zeta)+nP(c)$ for every $n$, which is unbounded. This rules out every bounded $W$; the passage to a bounded smooth
+weighted-divergence-free $V$ is the representation at the end of the proof of
+\cref{prop:product}.
+\end{proof}
+
+\begin{remark}[classes covered by \cref{prop:periodicflat}]\label{rem:periodicflat}
+Both conditions are one-dimensional tail conditions on $\varphi$, and neither
+involves the order of the minima.  Written in the variable
+$L=\log(1/\varepsilon)$, (i) allows $\mathcal A$ to grow like $L^{2-\eta}$
+(it is deliberately weaker than boundedness of $(\rho A)_-$, which is
+$\eta=2$), while (ii) allows the curvature weight to vanish like
+$-c_*L^{-q}\varepsilon^{-2}$ (the case $q=0$ is
+$-\mathcal W'\varepsilon^2\ge c_*>0$, its original form).  The positive
+curvature term of $I_2$ then grows like $L^{2-q}$ and the negative bound for
+$I_1$ like $L^{2-\eta}$; thus $q<\eta$ is exactly the condition that the
+curvature term wins, and it costs nothing in the families below.
+
+For $\varphi_1=\rho^2/(1+\rho^2)$ one has $\Psi=1/(2\varepsilon^2)$,
+$\mathcal W=(1-\varepsilon)/(2\varepsilon^2)$ and
+\begin{equation}
+\mathcal W'(\varepsilon)=-\frac1{\varepsilon^3}+\frac1{2\varepsilon^2}
+\le-\frac12\varepsilon^{-2}\qquad(0<\varepsilon\le1),
+\end{equation}
+while $\rho A=-4\rho^2/(1+\rho^2)\ge-4$; so (i) holds with $\eta=2$, (ii)
+with $q=0$ and $c_*=1/2$, and
+\cref{prop:periodicflat} recovers \cref{prop:periodic} by a different
+argument, valid for every positive nonconstant $2\pi$-periodic $h\in C^2(\R)$.
+The genuinely new cases are the following.
+\begin{itemize}
+\item Power tail $1-\varphi\sim C\rho^{-p}$: $\rho A\to-(p+2)$, so (i) holds
+with $\eta=2$; $\Psi\sim\widehat C\varepsilon^{-(p+2)/p}$ and
+$-\mathcal W'\varepsilon^2\sim\frac{p+2}{p}\widehat
+C\varepsilon^{-2/p}\to\infty$, so (ii) holds with $q=0$.
+\item Exponential tail $1-\varphi=e^{-\kappa\rho}(1+\kappa\rho)$: here
+$\rho A\equiv-\kappa\rho$ is unbounded, but $\varepsilon=e^{-\kappa\rho}(1+\kappa\rho)$
+gives $\kappa\rho=L+O(\log L)$ with $L=\log(1/\varepsilon)$, so (i) holds with
+$\eta=1$; moreover $\Psi=e^{\kappa\rho}/\kappa^2\asymp\varepsilon^{-1}$ and
+\begin{equation}
+-\mathcal W'\varepsilon^2=\frac{1+\kappa\rho}{\kappa^2}
+\Bigl(1+\frac{1-\varepsilon}{\kappa\rho}\Bigr)\sim\frac{\rho}{\kappa}\to\infty ,
+\end{equation}
+so (ii) holds with $q=0$ and any $c_*$.
+\item Stretched-exponential tail $\varepsilon\sim e^{-\rho^\alpha}$:
+$\rho A=(\alpha-2)-\alpha\rho^\alpha$, so $(\rho A)_-=\alpha L+O(1)$ and (i)
+holds with $\eta=1$ for \emph{every} $\alpha>0$.  Also
+$\Psi\sim\alpha^{-1}\varepsilon^{-1}\rho^{2-\alpha}$ and
+\begin{equation}
+-\mathcal W'\varepsilon^2=\frac{\rho^{2-\alpha}}{\alpha}
++\frac{(1-\varepsilon)(2-\alpha)}{\alpha^2}\rho^{2-2\alpha},
+\end{equation}
+which tends to $+\infty$ when $\alpha<2$, equals $1/2$ when $\alpha=2$, and
+decays like $\frac1\alpha\rho^{2-\alpha}=\frac1\alpha
+L^{(2-\alpha)/\alpha}$ when $\alpha>2$ (the second term being negligible
+against the first).  With $q(\alpha)=(\alpha-2)_+/\alpha\in[0,1)$ this is
+precisely (ii): for $\alpha\le2$ the weight does not decay at all ($q=0$),
+and for $\alpha>2$ it decays only like a power of $L$.  Hence (ii) holds for
+\emph{every} $\alpha>0$, and since $q(\alpha)<1=\eta$ in all cases the
+comparison $q<\eta$ is satisfied.  (For $\alpha>2$ the constant furnished by
+(ii) is naturally small, so the divergence asserted by
+\cref{prop:periodicflat} is far beyond the range of direct numerics; the claim
+is asymptotic.)
+\end{itemize}
+Thus every profile in the three families above satisfies (i) and (ii) for
+\emph{arbitrary} $C^2$ periodic $h$, flat minima included.  What remains open
+is an $\mathcal A$ growing like $L^2$ or faster in (i), or a curvature weight
+vanishing faster than any power of $L$ in (ii) --- for instance
+$-\mathcal W'\varepsilon^2\lesssim e^{-(\log\frac1\varepsilon)^\beta}$ with
+$\beta>1$ (for $\beta\le1$ this is not faster than any power of $L$).
+\end{remark}
+\section{The obstruction}\label{sec:obstruction}
+
+\begin{remark}[the bounded class: obstruction and a non-admissible counterexample]\label{rem:2dopen}
+By \cref{prop:shear,prop:zeroadv,prop:product,prop:min,prop:periodic,prop:periodicgen,prop:periodicflat},
+the shear and zero-advection classes, the product classes covered by
+\cref{prop:product,prop:min}, the entire periodic product class for
+$\varphi_1$ with arbitrary $C^2$ data, the periodic product class for every
+saturating $\varphi$ satisfying \eqref{eq:Htheta} with finitely many
+finite-order global minima, and the periodic product class for every
+saturating $\varphi$ satisfying (i)--(ii) of \cref{prop:periodicflat} with
+arbitrary $C^2$ data are rigid
+without any decay hypothesis. In particular the all-degenerate example
+$h=1-\cos\zeta+\cos^3\zeta/3$, for which $h''=0$ at every critical point, is
+now excluded for $\varphi_1$ and for every $\varphi$ satisfying
+\eqref{eq:Htheta} with $K=2$. The periodic product class for a general
+$\varphi$, and the general class $V^\rho\not\equiv0$, remain open; no
+admissible counterexample is known.
+The obstruction is visible in the exact weighted identity, valid for every
+bounded smooth $D\Subset\{\rho>0\}\times\R$,
+\begin{equation}\label{eq:2denergy}
+\nu\int_D\frac{|\grad G|^2}{\rho}
+=\nu\oint_{\partial D}\frac{G\,\partial_nG}{\rho}
+-\frac12\oint_{\partial D}\frac{(V\cdot n)G^2}{\rho}
+-\int_D\frac{V^\rho G^2}{\rho^2},
+\end{equation}
+obtained by testing \eqref{eq:2d} against $G/\rho$; here $\Delta_\mu$ is
+self-adjoint in $L^2(\rho^{-1}d\rho\,d\zeta)$, and the last term is the
+sign-indefinite bulk flux. It has no gradient factor and is not controlled by
+the pointwise bound $|V|\le C_0$ alone; the counterexample below shows that
+boundedness and axis regularity without weighted incompressibility do not
+suffice. Whether the bulk flux can be dominated in the bounded class, where
+the surface terms in \eqref{eq:2denergy} are also uncontrolled, is the open
+question. Equivalently, with
+$h=G/\rho^2$,
+\begin{equation}\label{eq:2dlift}
+\Div_5\bigl(\nu\grad h-Vh\bigr)=0,\qquad
+\Div_5V=\frac{2V^\rho}{\rho},
+\end{equation}
+so $V^\rho\not\equiv0$ makes the zero-order coefficient sign-indefinite and
+the maximum principle unavailable. In the Navier--Stokes class
+$V_0=2V^\rho/\rho=\partial_\zeta W$ is a $\zeta$-derivative of a bounded
+function. This relation is, however, automatic for every
+bounded smooth weighted-div-free field: with
+$\psi=\int_0^\rho rV^\zeta(r,\zeta)\,dr$ one has
+$|W|\le\|V^\zeta\|_\infty$ and $V^\rho=\rho W_\zeta/2$. It therefore carries
+no sign and does not by itself close the lemma; the genuinely
+Navier--Stokes-specific inputs are $(H_2)$ and the momentum coupling, neither
+of which is visible in the abstract problem \eqref{eq:2d}.
+
+The level-set form of \eqref{eq:2d} is also exact. With
+$X=(G_\zeta,-G_\rho)$, \eqref{eq:2d} is the transport equation
+\begin{equation}\label{eq:2dtransport}
+X\cdot\grad W+\frac{2G_\zeta}{\rho}W
+=-\frac{2\nu}{\rho}\Delta_\mu G .
+\end{equation}
+Along the characteristics $d\rho/ds=G_\zeta$, $d\zeta/ds=-G_\rho$ the
+integrating factor is $\rho^2$, so on a closed level curve $\gamma$
+\begin{equation}\label{eq:2dfredholm}
+\oint_\gamma\rho\,\Delta_\mu G\,ds=0 .
+\end{equation}
+This is an identity, not a constraint: on-shell $\rho^2W=-2\psi$ is
+single-valued, so the circulation in \eqref{eq:2dfredholm} vanishes
+automatically. The only local content is $\Delta G(P)=0$ at a strict interior
+extremum $P$. Closed-orbit solvability therefore cannot supply the missing
+sign in \eqref{eq:2denergy}. The closedness of $\gamma$ is essential: a
+periodic open level graph in the plane is not a closed loop, and the period
+integral need not vanish (\cref{rem:drift}).
+
+Boundedness, axis regularity and $G(0,\zeta)=0$ alone do not suffice: the
+field
+\begin{equation}\label{eq:2dcounter}
+V^\rho=-\frac{4\nu\rho}{1+\rho^2},\qquad V^\zeta=0,\qquad
+G=\frac{\rho^2}{1+\rho^2}
+\end{equation}
+satisfies $V\cdot\grad G=\nu\Delta_\mu G$ exactly, with $V$ bounded,
+$V^\rho=O(\rho)$, $G\in C^2\cap L^\infty$ and
+$G(0)=\partial_\rho G(0)=0$, yet $G\not\equiv0$. It is \emph{not}
+admissible: its weighted divergence
+$\partial_\rho(\rho V^\rho)+\partial_\zeta(\rho V^\zeta)
+=-8\nu\rho/(1+\rho^2)^2\ne0$, and any
+weighted-div-free completion would require
+$V^\zeta=8\nu\zeta/(1+\rho^2)^2+O(1)$, which is unbounded in $\zeta$. The
+mechanism is escape to $\rho=\infty$: the scale density of the
+$\rho$-marginal is $\rho/(1+\rho^2)^2$, whose total mass is finite, so the
+axis is reached only with probability $1/(1+\rho_0^2)<1$. Weighted
+incompressibility is therefore essential. The surviving open case is the
+sign-indefinite flux in \eqref{eq:2denergy}, of the same sign-indefinite,
+gradient-free type as the averaged correlation
+$C=\langle b^\rho\Gamma\rangle$ of the companion paper \cite{companion}.
+
+Finally, the axis condition $G=O(\rho^2)$ cannot be dropped: with $V=0$,
+the $\Delta_\mu$-harmonic profile
+$G=\rho^2(\rho^2+\zeta^2)^{-3/2}$ is bounded at spatial infinity but blows
+up at the origin along $\zeta=0$.
+\end{remark}
+
+
+\section*{Funding}
+This research received no specific grant from any funding agency in the
+public, commercial, or not-for-profit sectors.
+
+\section*{Conflict of interest}
+The author declares that there is no conflict of interest.
+
+\begin{thebibliography}{9}
+\bibitem{companion}
+\emph{Companion paper}: the conditional Liouville theorem for ancient
+axisymmetric Navier--Stokes flow with swirl at the critical endpoint.
+% TODO: replace with the final reference once Paper A is submitted.
+\bibitem{KNSS}
+G.~Koch, N.~Nadirashvili, G.~Seregin, V.~\v{S}ver\'ak,
+\emph{Liouville theorems for the Navier--Stokes equations and applications},
+Acta Math. \textbf{203} (2009), 83--105.
+\bibitem{Doob}
+J.~L. Doob, \emph{Classical Potential Theory and Its Probabilistic
+Counterpart}, Grundlehren der mathematischen Wissenschaften \textbf{262},
+Springer, 1984.
+\bibitem{Pinsky}
+R.~G. Pinsky, \emph{Positive Harmonic Functions and Diffusion},
+Cambridge Studies in Advanced Mathematics \textbf{45}, Cambridge University
+Press, 1995.
+\bibitem{SSSZ}
+G.~Seregin, L.~Silvestre, V.~\v{S}ver\'ak, A.~Zlato\v{s}, \emph{On
+divergence-free drifts}, J. Differential Equations \textbf{252} (2012), no.~1,
+505--540; arXiv:1010.6025.
+\bibitem{LRZperiodic}
+Z.~Lei, X.~Ren, Q.~S. Zhang, \emph{A Liouville theorem for axi-symmetric
+Navier--Stokes equations on $\R^2\times\mathbb{T}^1$}, Math. Ann.
+\textbf{383} (2022), 415--431.
+\bibitem{LZZ}
+Z.~Lei, Q.~S. Zhang, N.~Zhao, \emph{Improved Liouville theorems for axially
+symmetric Navier--Stokes equations}, Scientia Sinica Mathematica \textbf{47}
+(2017), no.~10, 1183--1198; arXiv:1701.00868.
+\end{thebibliography}
+
+\end{document}
