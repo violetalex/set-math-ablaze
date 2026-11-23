@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from . import __version__
-from . import checks, doctor, selfcheck
+from . import checks, doctor, frontier, selfcheck
 from . import ledger as ledger_mod
 from . import paper as paper_mod
 from .config import CONFIG_NAME, load
@@ -206,6 +206,52 @@ def cmd_ledger(args) -> int:
     return 1 if report.errors else 0
 
 
+def cmd_frontier(args) -> int:
+    root = find_root(args.root)
+    cfg = load(root)
+    res = frontier.run(cfg, targets=args.target, timeout=args.timeout)
+    if res.error and not res.targets:
+        print("错误：{}".format(res.error), file=sys.stderr)
+        return 2
+
+    if args.write:
+        path = Path(args.write).expanduser()
+        if not path.is_absolute():
+            path = root / path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(frontier.to_markdown(res, cfg), encoding="utf-8")
+        print("已写出 {}".format(path))
+
+    if args.json:
+        payload = {
+            "targets": {
+                name: (None if t is None else {
+                    "project": t.project,
+                    "external": [
+                        {"name": i.name, "kind": i.kind,
+                         "module": i.module, "bucket": i.bucket}
+                        for i in t.external],
+                })
+                for name, t in res.targets.items()
+            },
+            "missing": res.missing,
+            "project_modules": res.project_modules,
+            "ok": res.ok,
+            "error": res.error,
+        }
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return 0 if res.ok else 1
+
+    print("审计面   {}   (库 {})".format(root, cfg.lib))
+    print()
+    for line in frontier.summary_lines(res):
+        print(line)
+    if res.error:
+        print()
+        print(RED + res.error + RESET)
+    return 0 if res.ok else 1
+
+
 def cmd_doctor(args) -> int:
     root = find_root(args.root)
     cfg = load(root)
@@ -279,6 +325,15 @@ def build_parser() -> argparse.ArgumentParser:
     s.add_argument("--root")
     s.add_argument("--json", action="store_true")
     s.set_defaults(func=cmd_status)
+
+    fr = sub.add_parser("frontier", help="算审计面：证明从工程外借用了什么")
+    fr.add_argument("--root")
+    fr.add_argument("--target", action="append",
+                    help="指定声明（可多次；默认取台账里的 PROVED 行）")
+    fr.add_argument("--write", help="同时写出 markdown（相对工程根）")
+    fr.add_argument("--json", action="store_true")
+    fr.add_argument("--timeout", type=int, default=1800)
+    fr.set_defaults(func=cmd_frontier)
 
     d = sub.add_parser("doctor", help="环境体检")
     d.add_argument("--root")

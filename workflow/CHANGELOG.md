@@ -1,5 +1,21 @@
 # 更新记录
 
+## 未发布
+
+**新增**
+
+- `mathlean frontier`：算**审计面**。从台账的 `PROVED` 行出发，沿项目内部声明做传递闭包，
+  收集它们直接从 Mathlib/Init 借来的常量，按「公理 / 数学定理 / 策略支撑 / 定义与实例 /
+  语言基础」分类。`--write` 写出 markdown，`--json` 给机器读，`--target` 指定声明。
+  只读报告，不参与退出码。
+- 骨架新增 `tools/skeleton/Frontier.lean`（`mathlean new` 会带上）。
+- 11 个单元测试（`tests/test_frontier.py`），总计 86。
+
+**修正**
+
+- `DEFAULT_MATHLIB` 与 `mathlean.ini` 不再写死本机路径；相对路径按工程根解析。
+- README 里的测试数从 58/75 统一到实际值。
+
 ## 1.0.0 — 2026-11-13
 
 从"一堆脚本"重构成可安装、可测试、可自检的工具。

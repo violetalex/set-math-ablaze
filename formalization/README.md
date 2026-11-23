@@ -69,6 +69,7 @@ docs/SPEC.md            what is claimed: objects, hypotheses, quantifiers, falsi
 docs/FIDELITY.md        independent audit: is the Lean statement the paper's statement?
 docs/AUDIT.md           audit log, including errors found in the first draft
 docs/P5-RANKING.md      cost ranking of all results in papers A and B
+docs/FRONTIER.md        audit surface: what the proofs borrow from outside (generated)
 docs/CLAIMS.md          symlink to the canonical ledger at the repository root
 docs/RUNS/              run record: workflow ids, agent counts, gate status
 Scratch/                exploratory files, not built and not part of the library

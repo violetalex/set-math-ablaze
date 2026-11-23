@@ -24,7 +24,7 @@ OK
 
 | | 谁做 | 有没有测试 |
 |---|---|---|
-| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，75 个单元测试 + 12 个自检场景 |
+| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，86 个单元测试 + 12 个自检场景 |
 | 证明、找反例、对抗审计、形式化、陈述保真 | `workflow.js` 编排的 agent | 靠 P0–P9 的结构与门禁约束 |
 
 确定性部分出错是**可复现的 bug**；agent 部分出错是**判断失误**。两者要用完全不同的办法兜。
@@ -90,12 +90,38 @@ bash scripts/check.sh                   # 验收
 却会把 `paper.tex` 里每个带 `\label` 的定理/命题/引理/推论/假设拿去和台账对照——
 定理类没被引用是错误，remark 没被引用是警告，没有 `\label` 的只计数。
 
+## 审计面（`frontier`）
+
+五道门回答「证得对不对」，但没有回答：**证明本体之外，还有哪些事实在被使用？**
+
+```
+mathlean frontier                 # 从台账的 PROVED 行出发
+mathlean frontier --target Foo.x  # 指定声明
+mathlean frontier --write docs/FRONTIER.md
+```
+
+做法：沿**项目内部**的声明做传递闭包（在 Mathlib 边界停下，不展开），收集闭包里
+每个声明直接引用的外部常量，按来源分成五类：
+
+| 类别 | 含义 | 要不要人看 |
+|---|---|---|
+| 公理 | `axiom` / `sorryAx` | 永远要 |
+| 数学定理 | 工程外的非策略命题 | **要，这就是审计面** |
+| 策略支撑 | `Mathlib.Tactic.*`，`ring`/`field_simp` 展开的引理 | 不用逐条 |
+| 定义与实例 | 定义、结构、实例投影 | 不用逐条，但定义被改过定理就换了意思 |
+| 语言基础 | `Init` / `Lean` / `Std` / `Batteries` | 不用 |
+
+证明越长大，这个分类越重要：中段交给 kernel，两端留给人。
+参考 `formalization/docs/FRONTIER.md`——两个定理、437 条外部引用，
+其中真正需要核对的是 95 条数学定理。
+
 ## 命令
 
 ```
 mathlean new <目录> <库名>      建工程
 mathlean check                  验收（--no-build / --no-audit / --json）
 mathlean ledger --file C.md     只查台账（--tex 顺带核对论文环境覆盖）
+mathlean frontier               算审计面：证明从工程外借用了什么（--write 写 markdown）
 mathlean status                 看工程现状：阶段产物、台账计数、运行记录
 mathlean doctor                 环境体检：elan、lake、Mathlib、配置
 mathlean selfcheck              验证门禁本身按预期工作（12 个场景）
@@ -128,7 +154,7 @@ mathlean/             检查器本体
   scaffold.py           建工程 / vendoring
   doctor.py             环境体检
   selfcheck.py          门禁自检
-tests/                75 个单元测试：python3 -I run_tests.py
+tests/                86 个单元测试：python3 -I run_tests.py
 workflow.js           P0–P9 多 agent 编排
 WORKFLOW.md           方法论：十条铁律、阶段、门禁
 docs/ARCHITECTURE.md  为什么这样分层
