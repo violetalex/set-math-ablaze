@@ -59,6 +59,8 @@ SCENARIOS: List[Scenario] = [
     Scenario("干净工程", None, lambda root: None),
     Scenario("真写了 sorry", "sorry",
              _append("Lib/Basic.lean", "\ntheorem bad : True := by\n  sorry\n")),
+    Scenario("用了 native_decide", "sorry",
+             _append("Lib/Basic.lean", "\nexample : (1 : Nat) = 1 := by\n  native_decide\n")),
     Scenario("sorry 只出现在注释里", None,
              _append("Lib/Basic.lean", "\n-- 这里不许写 sorry\n")),
     Scenario("PROVED 的声明不存在", "ledger",

@@ -152,7 +152,7 @@ minor 排序）。超预算时停止并在返回值里报 `attack_skipped`——
 | 门 | 检查什么 |
 |---|---|
 | `build` | `lake build` 通过 |
-| `sorry` | 源码无 `sorry`/`admit`（注释与字符串不算） |
+| `sorry` | 源码无 `sorry`/`admit`/`native_decide`/`implemented_by`/`extern`（注释与字符串不算） |
 | `axioms` | `Audit.lean` 跑通；每个声明依赖的公理 ⊆ 白名单；自定义 `axiom` 已登记 |
 | `statement` | 声明类型 ≡ `Statements.lean` 里独立重写的 `Challenge.<名字>` |
 | `ledger` | 台账 ↔ 源码 ↔ 审计 ↔ 依赖图一致；**依赖不成环** |

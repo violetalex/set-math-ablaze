@@ -263,7 +263,7 @@ have seen it made.
 \subsection{What is code}
 
 Everything that can be decided mechanically is implemented in a dependency-free
-Python package of roughly two thousand lines, with 100 unit tests and 12
+Python package of roughly two thousand lines, with 103 unit tests and 13
 self-test scenarios:
 
 \begin{itemize}
@@ -291,7 +291,8 @@ whose reported line numbers drift is a scanner nobody trusts.
 Gate & Question \\
 \midrule
 \code{build} & does the library compile? \\
-\code{sorry} & is there an admitted hole? \\
+\code{sorry} & is there an admitted hole, or a proof that trusts
+  something outside the kernel? \\
 \code{axioms} & does each public declaration depend only on permitted axioms? \\
 \code{statement} & is the declaration's type definitionally equal to an
   independently written challenge? \\

@@ -39,6 +39,25 @@ class ScanTest(unittest.TestCase):
         # `sorryAx` 不算 sorry —— 它是公理名，不是占位符
         self.assertEqual(lean_scan.scan_text("axiom sorryAx : False\n"), [])
 
+    def test_trust_escapes_are_flagged(self):
+        # 这些和 sorry 同类：都让 kernel 之外的东西参与判定
+        for tok, src in [
+            ("native_decide", "example : (1:Nat) = 1 := by\n  native_decide\n"),
+            ("implemented_by", "@[implemented_by fast]\ndef slow : Nat := 0\n"),
+            ("extern", "@[extern \"c_foo\"]\nopaque foo : Nat\n"),
+        ]:
+            found = lean_scan.scan_text(src, "f.lean")
+            self.assertEqual([f.token for f in found], [tok], tok)
+
+    def test_external_is_not_extern(self):
+        # 词边界必须生效，否则 `external` 会误报
+        self.assertEqual(lean_scan.scan_text("-- external link\ndef x := 1\n"), [])
+        self.assertEqual(lean_scan.scan_text("def coexternal := 1\n"), [])
+
+    def test_trust_escape_in_comment_ignored(self):
+        src = "/- 我们不用 native_decide -/\ntheorem t : True := trivial\n"
+        self.assertEqual(lean_scan.scan_text(src), [])
+
     def test_both_tokens_sorted(self):
         src = "admit\nsorry\n"
         found = lean_scan.scan_text(src)

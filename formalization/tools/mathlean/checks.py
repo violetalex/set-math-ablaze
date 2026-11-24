@@ -105,10 +105,12 @@ def check_sorry(cfg: Config) -> Result:
         return Result("sorry", False, "没有找到属于库 {} 的 .lean 文件".format(cfg.lib))
     findings, count = lean_scan.scan_files(files, cfg.root)
     if findings:
+        kinds = sorted({f.token for f in findings})
         return Result("sorry", False,
-                      "发现 {} 处 sorry/admit".format(len(findings)),
+                      "发现 {} 处 {}".format(len(findings), "/".join(kinds)),
                       [str(f) + "  ← " + f.text for f in findings])
-    return Result("sorry", True, "扫描 {} 个文件，无 sorry/admit".format(count))
+    return Result("sorry", True,
+                  "扫描 {} 个文件，无 {}".format(count, "/".join(lean_scan.DEFAULT_TOKENS)))
 
 
 def check_axioms(cfg: Config, enabled: bool = True) -> Result:

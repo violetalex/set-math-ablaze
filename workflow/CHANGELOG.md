@@ -14,8 +14,11 @@
 - `mathlean replay`：用 `leanchecker` 读编译产物、不经 elaborator 把每个模块重新交给 kernel
   检查。`build` 走 elaborator，replay 只走 kernel；对 `addDecl` / `kexactB` 这类绕过
   elaborator 的构造是唯一有效的检查。`--checker` 预留了接独立实现的口子。
+- `sorry` 门的禁词表从 `sorry`/`admit` 扩到 `native_decide` / `implemented_by` / `extern`——
+  这三个都和洞同类：让 kernel 之外的东西参与判定。词边界扫描，`external` 不误报。
+  自检场景 12 → 13。
 - 骨架新增 `tools/skeleton/Frontier.lean`（`mathlean new` 会带上）。
-- 18 个单元测试（`tests/test_frontier.py` 11 个、`tests/test_statements.py` 7 个），总计 100。
+- 18 个单元测试（`tests/test_frontier.py` 11 个、`tests/test_statements.py` 7 个），总计 103。
 
 **修正**
 

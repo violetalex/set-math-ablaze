@@ -15,7 +15,12 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable, List, Optional, Sequence, Tuple
 
-DEFAULT_TOKENS = ("sorry", "admit")
+# 这些构造都会让 kernel 之外的东西参与判定，和一个洞一样需要显式审计：
+#   sorry / admit        —— 接受任意命题，直接留洞；
+#   native_decide        —— 把判定编译成本机代码，信任编译器；
+#   implemented_by       —— 运行时替换实现，逻辑值与实际执行不一致；
+#   extern               —— 声明一个 Lean 之外实现的常量。
+DEFAULT_TOKENS = ("sorry", "admit", "native_decide", "implemented_by", "extern")
 
 _DECL_RE = re.compile(
     r"^[ \t]*(?:@\[[^\]]*\][ \t]*)*"

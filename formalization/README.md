@@ -50,7 +50,7 @@ lake build
 | Gate | Checks |
 |---|---|
 | `build` | `lake build` succeeds |
-| `sorry` | no `sorry`/`admit` in `Liouville/**` |
+| `sorry` | no `sorry`/`admit`/`native_decide`/`implemented_by`/`extern` in `Liouville/**` |
 | `axioms` | every declaration in `Audit.lean` has axioms ⊆ `{propext, Classical.choice, Quot.sound}` |
 | `statement` | each declaration is definitionally equal in type to its independently written challenge in `Statements.lean` |
 | `ledger` | every row of `docs/CLAIMS.md` resolves to a declaration that exists |

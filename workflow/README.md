@@ -24,7 +24,7 @@ OK
 
 | | 谁做 | 有没有测试 |
 |---|---|---|
-| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，100 个单元测试 + 12 个自检场景 |
+| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，103 个单元测试 + 13 个自检场景 |
 | 证明、找反例、对抗审计、形式化、陈述保真 | `workflow.js` 编排的 agent | 靠 P0–P9 的结构与门禁约束 |
 
 确定性部分出错是**可复现的 bug**；agent 部分出错是**判断失误**。两者要用完全不同的办法兜。
@@ -71,7 +71,7 @@ bash scripts/check.sh                   # 验收
 | 门 | 检查什么 | 失败意味着 |
 |---|---|---|
 | `build` | `lake build` | 代码编译不过 |
-| `sorry` | 源码里没有 `sorry`/`admit`（注释和字符串不算） | 有没补完的证明 |
+| `sorry` | 源码里没有 `sorry`/`admit`/`native_decide`/`implemented_by`/`extern`（注释和字符串不算） | 有洞，或有信任 kernel 之外的构造 |
 | `axioms` | `Audit.lean` 跑通；每个声明依赖的公理 ⊆ 白名单；自定义 `axiom` 已登记 | 证了，但可能是假证 |
 | `statement` | 声明的类型与 `Statements.lean` 里独立重写的 `Challenge.<名字>` 定义等价 | **证的不是那句话** |
 | `ledger` | 台账与源码、审计、依赖图一致；依赖不成环 | 陈诉与代码对不上，或循环论证 |
@@ -142,7 +142,7 @@ mathlean frontier               算审计面：证明从工程外借用了什么
 mathlean replay                 把编译产物交给 kernel 重放（不经 elaborator）
 mathlean status                 看工程现状：阶段产物、台账计数、运行记录
 mathlean doctor                 环境体检：elan、lake、Mathlib、配置
-mathlean selfcheck              验证门禁本身按预期工作（12 个场景）
+mathlean selfcheck              验证门禁本身按预期工作（13 个场景）
 mathlean upgrade                更新工程里的 tools/
 mathlean version
 ```
@@ -192,7 +192,7 @@ mathlean/             检查器本体
   scaffold.py           建工程 / vendoring
   doctor.py             环境体检
   selfcheck.py          门禁自检
-tests/                100 个单元测试：python3 -I run_tests.py
+tests/                103 个单元测试：python3 -I run_tests.py
 workflow.js           P0–P9 多 agent 编排
 WORKFLOW.md           方法论：十条铁律、阶段、门禁
 docs/ARCHITECTURE.md  为什么这样分层
