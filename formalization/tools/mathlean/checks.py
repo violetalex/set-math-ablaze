@@ -19,6 +19,7 @@ from typing import Dict, List, Optional
 
 from . import audit as audit_mod
 from . import ledger as ledger_mod
+from . import statements as statements_mod
 from . import lean_scan
 from . import docs_gate
 from .config import Config
@@ -152,6 +153,24 @@ def check_axioms(cfg: Config, enabled: bool = True) -> Result:
                   "{} 个声明，公理 ⊆ {{{}}}".format(len(res.axioms), ", ".join(sorted(allowed))))
 
 
+def check_statement(cfg: Config) -> Result:
+    """陈述门：`Statements.lean` 里的 `Challenge.<名字>` 是否与声明的类型定义等价。
+
+    没有挑战文件就跳过——这不是失败，只是说明这一层没有被独立重述过。
+    """
+    if not cfg.lib:
+        return Result("statement", False, "不知道库名，先设置 [project] lib")
+    res = statements_mod.run(cfg, cfg.timeout)
+    if res.skipped:
+        return Result("statement", True, res.error, skipped=True)
+    if not res.ran:
+        return Result("statement", False, res.error)
+    if res.ok:
+        return Result("statement", True,
+                      "{} 条陈述与声明类型等价".format(len(res.compared)))
+    return Result("statement", False, res.error, statements_mod.failures(res))
+
+
 def check_ledger(cfg: Config, axiom_map: Optional[Dict[str, set]] = None) -> Result:
     if not cfg.claims_path.is_file():
         if cfg.strict_docs:
@@ -222,6 +241,7 @@ def run(cfg: Config, build: bool = True, run_audit: bool = True) -> Report:
     if run_audit and ax.ok and cfg.lib:
         res = audit_mod.run(cfg.root, cfg.audit_file, cfg.timeout)
         axiom_map = res.axioms if res.ran and res.ok else None
+    rep.add(_timed("statement", lambda: check_statement(cfg)))
     rep.add(_timed("ledger", lambda: check_ledger(cfg, axiom_map)))
     rep.add(_timed("docs", lambda: check_docs(cfg)))
     return rep

@@ -24,7 +24,7 @@ OK
 
 | | 谁做 | 有没有测试 |
 |---|---|---|
-| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，86 个单元测试 + 12 个自检场景 |
+| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，93 个单元测试 + 12 个自检场景 |
 | 证明、找反例、对抗审计、形式化、陈述保真 | `workflow.js` 编排的 agent | 靠 P0–P9 的结构与门禁约束 |
 
 确定性部分出错是**可复现的 bug**；agent 部分出错是**判断失误**。两者要用完全不同的办法兜。
@@ -66,17 +66,34 @@ bash scripts/check.sh                   # 验收
 
 `check.sh` 就是 `mathlean check` 的薄封装，工程里的 `tools/` 自带实现。
 
-## 五道门
+## 六道门
 
 | 门 | 检查什么 | 失败意味着 |
 |---|---|---|
 | `build` | `lake build` | 代码编译不过 |
 | `sorry` | 源码里没有 `sorry`/`admit`（注释和字符串不算） | 有没补完的证明 |
 | `axioms` | `Audit.lean` 跑通；每个声明依赖的公理 ⊆ 白名单；自定义 `axiom` 已登记 | 证了，但可能是假证 |
+| `statement` | 声明的类型与 `Statements.lean` 里独立重写的 `Challenge.<名字>` 定义等价 | **证的不是那句话** |
 | `ledger` | 台账与源码、审计、依赖图一致；依赖不成环 | 陈诉与代码对不上，或循环论证 |
 | `docs` | 阶段产物齐全（`--strict-docs` 时强制） | 流程没走完 |
 
 任何一道失败，退出码 1。
+
+`statement` 门是唯一**不读证明**的门。在工程根放一个 `Statements.lean`，由不参与
+证明的人把每个 `PROVED` 命题按原样重写一遍：
+
+```lean
+namespace Challenge
+def Liouville.PhiExt_bound : Prop := ∀ (Γ : ℝ → ℝ → ℝ → ℝ) ..., ...
+end Challenge
+```
+
+门禁追加 `example : Challenge.Liouville.PhiExt_bound := Liouville.PhiExt_bound`，
+由 elaborator 判定两边类型是否定义等价。证明怎么改写都行，类型不对就不过。
+没有 `Statements.lean` 时这道门跳过（显示 `·`），不算失败。
+
+它挡不住的是**定义被改**：如果工程里的 `R` 不是论文的 `R`，两边会一起变，
+比对仍然通过。那一层靠 `frontier` 的「定义与实例」一节人工核对。
 
 `ledger` 门具体检查：
 
@@ -92,7 +109,7 @@ bash scripts/check.sh                   # 验收
 
 ## 审计面（`frontier`）
 
-五道门回答「证得对不对」，但没有回答：**证明本体之外，还有哪些事实在被使用？**
+六道门回答「证得对不对」，但没有回答：**证明本体之外，还有哪些事实在被使用？**
 
 ```
 mathlean frontier                 # 从台账的 PROVED 行出发
@@ -150,11 +167,11 @@ mathlean/             检查器本体
   audit.py              跑 lake env lean，解析 #print axioms 输出
   ledger.py             台账解析、行内规则、依赖环检测
   paper.py              LaTeX 定理环境 ↔ 台账 覆盖核对
-  checks.py             五道门
+  checks.py             六道门
   scaffold.py           建工程 / vendoring
   doctor.py             环境体检
   selfcheck.py          门禁自检
-tests/                86 个单元测试：python3 -I run_tests.py
+tests/                93 个单元测试：python3 -I run_tests.py
 workflow.js           P0–P9 多 agent 编排
 WORKFLOW.md           方法论：十条铁律、阶段、门禁
 docs/ARCHITECTURE.md  为什么这样分层

@@ -45,7 +45,7 @@
 | P3 反例搜索 | `docs/COUNTEREXAMPLES.md` | 每个引理至少被一个 lens 攻击过；无未解释的数值违例 |
 | P4 对抗审计 | `docs/AUDIT.md` | 每条 finding 有 CONFIRMED / PLAUSIBLE / REFUTED 判定 |
 | P5 形式化映射 | `docs/FORMALIZATION.md` | 每条引理映射到 Lean 陈述或标 INFORMAL-ONLY |
-| P6 Lean 实现 | `Lean/` 编译通过 | `mathlean check` 五道门全绿（见第 6 节） |
+| P6 Lean 实现 | `Lean/` 编译通过 | `mathlean check` 六道门全绿（见第 6 节） |
 | P7 陈述保真 | `docs/FIDELITY.md` | Lean 陈述与 SPEC 逐条一致；假设不强于原文 |
 | P8 成文与台账 | `docs/CLAIMS.md` + 论文 | 论文每一句断言都能追到台账一行 |
 | P9 终检 | `docs/FINAL.md` | 下面第 9 节清单全部打勾 |
@@ -147,17 +147,19 @@ minor 排序）。超预算时停止并在返回值里报 `attack_skipped`——
   其余 10 条一次都没轮到。按 id 摘除与对象是否被复制无关。
 - **禁止 `sorry`。** 写不下去就把该引理退回 P2，而不是留个洞。
 - 独立 `Audit.lean`：对每条主要定理 `#print axioms`，比对白名单。
-- `mathlean check`（工程里是 `scripts/check.sh`）是唯一验收口径，五道门：
+- `mathlean check`（工程里是 `scripts/check.sh`）是唯一验收口径，六道门：
 
 | 门 | 检查什么 |
 |---|---|
 | `build` | `lake build` 通过 |
 | `sorry` | 源码无 `sorry`/`admit`（注释与字符串不算） |
 | `axioms` | `Audit.lean` 跑通；每个声明依赖的公理 ⊆ 白名单；自定义 `axiom` 已登记 |
+| `statement` | 声明类型 ≡ `Statements.lean` 里独立重写的 `Challenge.<名字>` |
 | `ledger` | 台账 ↔ 源码 ↔ 审计 ↔ 依赖图一致；**依赖不成环** |
 | `docs` | 阶段产物齐全（`--strict-docs`） |
 
-前三道门管「证得对不对」，第四道门管「说的是不是同一件事」。
+前三道门管「证得对不对」，`statement` 门管「证的是不是这句话」，`ledger` 门管
+「说的和写的是不是同一件事」。
 
 **审计面不是门，是报告。** `mathlean frontier` 从台账的 `PROVED` 行出发，沿项目内部
 声明做传递闭包，收集它们直接从 Mathlib/Init 借来的常量，按「公理 / 数学定理 /

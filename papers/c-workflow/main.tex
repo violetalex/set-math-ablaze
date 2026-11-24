@@ -231,7 +231,7 @@ P4 & \code{AUDIT.md} & each finding classified \textbf{confirmed} /
   \textbf{plausible} / \textbf{refuted} \\
 P5 & \code{FORMALIZATION.md} & each lemma mapped to a \Lean{} statement or
   marked out of scope with the missing theory named \\
-P6 & \code{Lean/} & five gates green \\
+P6 & \code{Lean/} & six gates green \\
 P7 & \code{FIDELITY.md} & each formal statement compared to the specification
   and classified \textbf{match} / \textbf{weaker} / \textbf{stronger} /
   \textbf{different} \\
@@ -263,7 +263,7 @@ have seen it made.
 \subsection{What is code}
 
 Everything that can be decided mechanically is implemented in a dependency-free
-Python package of roughly two thousand lines, with 86 unit tests and 12
+Python package of roughly two thousand lines, with 93 unit tests and 12
 self-test scenarios:
 
 \begin{itemize}
@@ -283,7 +283,7 @@ line comments, and string literals containing dashes. The scanner now walks the
 source character by character and preserves line numbering, because a scanner
 whose reported line numbers drift is a scanner nobody trusts.
 
-\subsection{The five gates}
+\subsection{The six gates}
 
 \begin{center}
 \begin{tabular}{@{}ll@{}}
@@ -293,6 +293,8 @@ Gate & Question \\
 \code{build} & does the library compile? \\
 \code{sorry} & is there an admitted hole? \\
 \code{axioms} & does each public declaration depend only on permitted axioms? \\
+\code{statement} & is the declaration's type definitionally equal to an
+  independently written challenge? \\
 \code{ledger} & does every claim resolve, and is the dependency graph acyclic? \\
 \code{docs} & are the stage artifacts present? \\
 \bottomrule
@@ -300,8 +302,26 @@ Gate & Question \\
 \end{center}
 
 The first three gates concern whether something was proved. The fourth
-concerns whether the thing proved is the thing claimed. The fifth is
+concerns whether the thing proved is the thing claimed. The fifth checks
+that the claims and the sources agree with each other. The sixth is
 hygiene.
+
+\paragraph{The statement gate.} The fourth gate is the one that does not read
+the proof. A file \code{Statements.lean} restates every proposition marked
+\claim{PROVED}, written against the paper rather than against the
+formalization, in a namespace \code{Challenge}. The gate appends, for each
+target, the single line \code{example : Challenge.<name> := <name>} and asks
+Lean whether the two types are definitionally equal. A proof may be rewritten
+arbitrarily; a type that does not match fails.
+
+This is a machine-checked version of what stage P7 asks a human to do, and it
+was worth separating: in our case study the fidelity audit was the stage that
+found the boundary-point weakening, and it found it by reading. A gate that
+does not read is cheaper, more reproducible, and blind in a different place.
+It cannot see a redefined symbol -- if the project's \code{R} is not the
+paper's \code{R}, both sides change together and the comparison still
+succeeds. That layer remains with P7, and the report described in
+Section~\ref{sec:frontier} is what makes it tractable.
 
 The axiom gate is stronger than ``the build succeeded'' in a way that
 matters. A \Lean{} file can compile while depending on \code{sorryAx} (via an
@@ -330,6 +350,56 @@ that passed the documentation gate because the scaffolding generated the
 artifact files that the gate was looking for. The gate was checking for
 existence, and the scaffolding guaranteed existence. It now checks that the
 artifact has been edited since generation.
+
+\subsection{The audit surface}
+\label{sec:frontier}
+
+Six gates decide whether what was written is true. None of them answers a
+different question: what did the proof borrow from outside?
+
+For a proof of a few hundred lines the answer is ``read it''. For a proof of
+seventeen million lines it is not, and the difference is not one of degree. A
+large formalization has a large \emph{interior} and a small \emph{frontier}:
+the interior is checked by the kernel and need not be read, while the frontier
+--- the statements it imports --- is what a reader has to trust.
+
+The workflow computes this set. Starting from each \claim{PROVED}
+declaration, it takes the transitive closure through declarations defined in
+the project, stopping at the library boundary so that a borrowed lemma counts
+as one trust unit rather than an expansion of its own dependencies. It then
+collects each of those declarations' direct constant references, removes the
+project's own, and classifies the rest:
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Class & Meaning \\
+\midrule
+axiom & a primitive assumption, including \code{sorryAx} \\
+theorem & a proposition from outside the project \\
+tactic support & lemmas unfolded by \code{ring}, \code{field\_simp},
+  \code{norm\_num} \\
+definition & definitions, structures, instance projections \\
+core & \code{Init}, \code{Lean}, \code{Std}, \code{Batteries} \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Separating tactic support from mathematics is not cosmetic. In our case study
+the proof of one lemma borrows $437$ constants from outside the project;
+$91$ of them are lemmas unfolded by tactics, $170$ are definitional, and $95$
+are theorems. Only the last group is an audit surface in the sense that
+matters. Reporting all $437$ would have buried the $95$.
+
+The command is a report, not a gate. Borrowing five hundred lemmas from the
+library is not an error; it is the normal condition of formalized mathematics.
+What changes is that the set is now countable, and can be put in front of the
+person who is going to read the proof.
+
+This is also why the statement gate above is not sufficient on its own. A
+challenge file pins the statement; the frontier report lists the definitions
+the statement is written in terms of. Together they cover the two ends: what
+is claimed, and what is assumed.
 
 \section{The judgement layer}
 
@@ -603,6 +673,7 @@ idea.
 
 \section{Gate definitions}
 
+{\sloppy
 \begin{description}
 \item[\textbf{build}] \code{lake build} exits zero.
 \item[\textbf{sorry}] the comment-stripped source contains no \code{sorry}
@@ -610,6 +681,10 @@ idea.
 \item[\textbf{axioms}] \code{Audit.lean} compiles, and for every declaration
   named in it, the transitive axiom set is contained in the configured
   whitelist. A custom axiom not registered in the ledger is an error.
+\item[\textbf{statement}] every declaration named in a \claim{PROVED} row has a
+  challenge declaration \code{Challenge.<name>} in \code{Statements.lean}, and
+  Lean reports the two types as definitionally equal. Skipped, not failed,
+  when no challenge file exists.
 \item[\textbf{ledger}] the ledger parses; states are legal; \claim{CONDITIONAL}
   rows carry hypotheses; \claim{REFUTED} rows carry counterexamples;
   \claim{PROVED} rows name existing declarations that are axiom-audited; the
@@ -617,6 +692,7 @@ idea.
 \item[\textbf{docs}] the stage artifacts exist and have been modified since
   scaffolding.
 \end{description}
+}
 
 \section{An excerpt of the ledger}
 

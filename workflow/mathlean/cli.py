@@ -91,7 +91,8 @@ def cmd_new(args) -> int:
   1. 写 {d}/docs/SPEC.md        （对象、假设、结论、可伪性）
   2. 写 {d}/docs/CLAIMS.md      （命题台账）
   3. 在 {d}/{lib}/ 下写 Lean
-  4. bash {d}/scripts/check.sh  验收
+  4. 写 {d}/Statements.lean     （独立重写每个 PROVED 命题，namespace Challenge）
+  5. bash {d}/scripts/check.sh  验收
 """.format(d=dest, lib=args.lib))
     return 0
 

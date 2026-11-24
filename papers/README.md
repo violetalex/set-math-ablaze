@@ -32,6 +32,6 @@ required.
 ## A note on the numbers in paper C
 
 Paper C reports counts taken from this repository: 31 formal statements
-extracted from A and B (28 after deduplication), 35 ledger rows, 86 unit tests,
+extracted from A and B (28 after deduplication), 35 ledger rows, 93 unit tests,
 12 self-test scenarios. If you re-run the tooling and get different numbers,
 the tooling is right and paper C is stale.

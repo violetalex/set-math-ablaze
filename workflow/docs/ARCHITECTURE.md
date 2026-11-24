@@ -34,7 +34,7 @@ agent 之间不直接传状态，只通过文件交接。这样每一步的产�
 | `lean_scan.py` | 注释剥离、sorry 扫描、声明抽取 | **行号必须与源文件一致**（保留换行） |
 | `audit.py` | 跑 `lake env lean Audit.lean`，解析公理 | 不依赖 `lake build` 的警告文本 |
 | `ledger.py` | 台账解析与一致性 | 一条台账行 = 一个可追溯的断言 |
-| `checks.py` | 五道门 | 门禁本身出错也要变成一条失败，而不是崩溃 |
+| `checks.py` | 六道门 | 门禁本身出错也要变成一条失败，而不是崩溃 |
 | `scaffold.py` | 建工程、vendoring | 生成物必须能独立运行 |
 | `doctor.py` | 环境体检 | 每个失败都要给「怎么修」 |
 | `selfcheck.py` | 门禁自检 | 每个门都要有一个"故意弄坏"的场景证明它会响 |

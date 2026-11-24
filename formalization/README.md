@@ -45,15 +45,22 @@ lake build
 
 ## Verification
 
-`scripts/check.sh` is the single acceptance criterion. It runs five gates:
+`scripts/check.sh` is the single acceptance criterion. It runs six gates:
 
 | Gate | Checks |
 |---|---|
 | `build` | `lake build` succeeds |
 | `sorry` | no `sorry`/`admit` in `Liouville/**` |
 | `axioms` | every declaration in `Audit.lean` has axioms ⊆ `{propext, Classical.choice, Quot.sound}` |
+| `statement` | each declaration is definitionally equal in type to its independently written challenge in `Statements.lean` |
 | `ledger` | every row of `docs/CLAIMS.md` resolves to a declaration that exists |
 | `docs` | the required design documents are present |
+
+The `statement` gate is the one that does not read the proof. `Statements.lean`
+restates each `PROVED` proposition, written against the paper rather than against
+the formalization; the gate asks Lean whether the two types are definitionally
+equal. It catches a theorem that proves something adjacent to what was claimed —
+which no compiler error would reveal.
 
 ```bash
 bash scripts/check.sh
@@ -108,7 +115,7 @@ Three things a reader should know.
 This directory is the formalization half of the repository. The papers it
 refers to are in [`../papers/`](../papers/), and the canonical ledger is
 [`../CLAIMS.md`](../CLAIMS.md); `docs/CLAIMS.md` here is a symlink to it, so the
-five gates and the papers cannot disagree about what is claimed.
+six gates and the papers cannot disagree about what is claimed.
 
 ## License
 

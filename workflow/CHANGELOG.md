@@ -4,12 +4,15 @@
 
 **新增**
 
+- `statement` 门（第六道）：工程根放 `Statements.lean`，用 `namespace Challenge` 独立
+  重写每个 `PROVED` 命题；门禁把声明类型与它做定义等价比较。只比类型，不读证明。
+  没有 `Statements.lean` 时跳过。
 - `mathlean frontier`：算**审计面**。从台账的 `PROVED` 行出发，沿项目内部声明做传递闭包，
   收集它们直接从 Mathlib/Init 借来的常量，按「公理 / 数学定理 / 策略支撑 / 定义与实例 /
   语言基础」分类。`--write` 写出 markdown，`--json` 给机器读，`--target` 指定声明。
   只读报告，不参与退出码。
 - 骨架新增 `tools/skeleton/Frontier.lean`（`mathlean new` 会带上）。
-- 11 个单元测试（`tests/test_frontier.py`），总计 86。
+- 18 个单元测试（`tests/test_frontier.py` 11 个、`tests/test_statements.py` 7 个），总计 93。
 
 **修正**
 
