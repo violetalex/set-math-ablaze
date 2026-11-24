@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import List, Optional
 
 from . import __version__
-from . import checks, doctor, frontier, replay, selfcheck
+from . import checks, doctor, frontier, replay, search, selfcheck
 from . import ledger as ledger_mod
 from . import paper as paper_mod
 from .config import CONFIG_NAME, load
@@ -253,6 +253,32 @@ def cmd_frontier(args) -> int:
     return 0 if res.ok else 1
 
 
+def cmd_search(args) -> int:
+    root = find_root(args.root)
+    cfg = load(root)
+    p = search.plan(cfg, policy=args.policy, limit=args.limit)
+    if args.json:
+        print(json.dumps({
+            "policy": p.policy,
+            "picks": [i.to_dict() for i in p.picks],
+            "ready": len(p.ready),
+            "blocked": len(p.blocked),
+            "terminal": len(p.terminal),
+            "dead": [i.id for i in p.dead],
+            "note": p.note,
+        }, ensure_ascii=False, indent=2))
+        return 0
+    print("调度   {}   (库 {})".format(root, cfg.lib))
+    print()
+    for line in search.summary_lines(p):
+        print(line)
+    if args.write:
+        path = search.write_record(cfg, p)
+        print()
+        print("已写 {}".format(path))
+    return 0
+
+
 def cmd_replay(args) -> int:
     root = find_root(args.root)
     cfg = load(root)
@@ -367,6 +393,14 @@ def build_parser() -> argparse.ArgumentParser:
     fr.add_argument("--json", action="store_true")
     fr.add_argument("--timeout", type=int, default=1800)
     fr.set_defaults(func=cmd_frontier)
+
+    se = sub.add_parser("search", help="在引理 DAG 上排下一轮该攻哪里")
+    se.add_argument("--root")
+    se.add_argument("--policy", choices=search.POLICIES, default="greedy")
+    se.add_argument("--limit", type=int, default=5)
+    se.add_argument("--write", action="store_true", help="写 docs/RUNS/search-<时间>.json")
+    se.add_argument("--json", action="store_true")
+    se.set_defaults(func=cmd_search)
 
     rp = sub.add_parser("replay", help="把编译产物交给 kernel 重放（不经 elaborator）")
     rp.add_argument("--root")

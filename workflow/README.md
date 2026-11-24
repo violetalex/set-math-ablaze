@@ -24,7 +24,7 @@ OK
 
 | | 谁做 | 有没有测试 |
 |---|---|---|
-| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，111 个单元测试 + 13 个自检场景 |
+| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，123 个单元测试 + 13 个自检场景 |
 | 证明、找反例、对抗审计、形式化、陈述保真 | `workflow.js` 编排的 agent | 靠 P0–P9 的结构与门禁约束 |
 
 确定性部分出错是**可复现的 bug**；agent 部分出错是**判断失误**。两者要用完全不同的办法兜。
@@ -146,6 +146,7 @@ mathlean check                  验收（--no-build / --no-audit / --json）
 mathlean ledger --file C.md     只查台账（--tex 顺带核对论文环境覆盖）
 mathlean frontier               算审计面：证明从工程外借用了什么（--write 写 markdown）
 mathlean replay                 把编译产物交给 kernel 重放（不经 elaborator）
+mathlean search                 在引理 DAG 上排下一轮该攻哪里（--policy rr|greedy|ucb）
 mathlean status                 看工程现状：阶段产物、台账计数、运行记录
 mathlean doctor                 环境体检：elan、lake、Mathlib、配置
 mathlean selfcheck              验证门禁本身按预期工作（13 个场景）
@@ -173,6 +174,29 @@ Mathlib   d13f23b723b8
 它防的是"elaborator 环节被绕过"，防不了"kernel 本身有 bug"。真正独立的实现
 （nanoda）需要单独安装，`--checker` 参数留了这个口子。
 
+## 调度（`search`）
+
+"下一轮该攻哪条引理"现在是个显式的、可复现的选择：
+
+```
+$ mathlean search --write
+策略 greedy   就绪 11   未就绪 19   终态 5   已死 0
+   1. A9     分数   2.81  被引用 3  陈述 46 字  试过 0 次  [PROVED-INFORMAL]
+   2. A8     分数   1.53  被引用 2  陈述 113 字 试过 0 次  [PROVED-INFORMAL]
+```
+
+- **就绪** = 状态还可推进（`OPEN` / `CONDITIONAL` / `PROVED-INFORMAL` / `INFORMAL-ONLY`）
+  且依赖都是 `PROVED` 或 `CITED`；依赖里有 `REFUTED` 的记为**已死**。
+- **打分** = `被引用次数 − 0.5×(陈述字数/120) − 0.3×已试次数`。
+- **策略**：`rr` 按 ID 轮转（基线）、`greedy` 按分数、`ucb` 用上一轮日志推断出的奖励。
+- `--write` 把本轮决策连同当时的全部状态写进 `docs/RUNS/search-<时间>.json`。
+
+**为什么要落盘。** 下一轮读回上一轮的 `picks` 和 `statuses`，就能算出"上次挑的那些有没有前进"，
+这就是奖励。有了日志，策略才可离线对比——先有记录，再谈优化。
+
+**边界**：动作空间里没有"改陈述"。陈述由 `Statements.lean` 钉死；调度器只决定顺序，
+不决定证什么。否则最优策略一定是把定理证成平凡的。
+
 ## 跟着 Claude Code 跑
 
 最省事的入口是斜杠命令：
@@ -198,7 +222,7 @@ mathlean/             检查器本体
   scaffold.py           建工程 / vendoring
   doctor.py             环境体检
   selfcheck.py          门禁自检
-tests/                111 个单元测试：python3 -I run_tests.py
+tests/                123 个单元测试：python3 -I run_tests.py
 workflow.js           P0–P9 多 agent 编排
 WORKFLOW.md           方法论：十条铁律、阶段、门禁
 docs/ARCHITECTURE.md  为什么这样分层

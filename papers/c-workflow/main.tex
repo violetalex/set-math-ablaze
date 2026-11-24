@@ -294,7 +294,7 @@ have seen it made.
 \subsection{What is code}
 
 Everything that can be decided mechanically is implemented in a dependency-free
-Python package of roughly two thousand lines, with 111 unit tests and 13
+Python package of roughly two thousand lines, with 123 unit tests and 13
 self-test scenarios:
 
 \begin{itemize}
@@ -446,6 +446,55 @@ This is also why the statement gate above is not sufficient on its own. A
 challenge file pins the statement; the frontier report lists the definitions
 the statement is written in terms of. Together they cover the two ends: what
 is claimed, and what is assumed.
+
+\subsection{Ordering the work}
+\label{sec:search}
+
+Proving with a language model is trial and error: sample attempts, check them,
+keep what passes. The loop is usually run in one direction --- attack a goal,
+retry --- and the choice of \emph{which} goal to attack is made implicitly.
+
+That choice is a scheduling problem, and it is worth separating from the
+proving. Three levels are available, and only two of them should be optimized:
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+Level & Optimizable? & Why \\
+\midrule
+what to prove & no & optimizing it means weakening the theorem \\
+how to decompose & yes & which lemma to isolate, how far to split \\
+how to prove a lemma & yes & tactic portfolio, premise selection \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The workflow schedules deterministically. From the ledger it computes the
+\emph{ready set}: rows whose state is still actionable and whose dependencies
+are all settled, excluding rows that depend on a refuted lemma, which are dead
+rather than blocked. It then ranks them by a score built from what the ledger
+already knows --- how many other rows depend on this one, how long its
+statement is, how many times it has been attempted.
+
+Two properties make the ranking useful rather than decorative. It is
+reproducible, because nothing in it is sampled. And it leaves a trace: each
+run writes its picks together with a snapshot of every row's state. The next
+run reads that snapshot, compares states, and infers a reward --- did the
+lemma it picked last time move? That gives an ordinary bandit loop without a
+single evaluator model, and, more importantly, it gives a log against which
+two policies can be compared offline.
+
+The constraint is the point. There is no action that edits the statement.
+Statements are fixed by the challenge file, written by someone other than the
+prover, and enforced by the statement gate of Section~4.2. A search that could
+edit its own goal would find, reliably, the cheapest true statement in the
+neighbourhood of the intended one. The scheduler decides order; it does not
+decide what is claimed.
+
+What this does not buy: information. A binary verifier gives no gradient, and
+reordering does not make an unformalizable lemma formalizable. When nine of
+thirty-one results are blocked by a missing theory rather than by effort, no
+policy shortens that path.
 
 \section{The judgement layer}
 

@@ -1,0 +1,153 @@
+{
+  "time_utc": "20261124T052925Z",
+  "policy": "greedy",
+  "picks": [
+    "A9",
+    "A8",
+    "A3",
+    "A19",
+    "A7"
+  ],
+  "ready": 11,
+  "blocked": 19,
+  "terminal": 5,
+  "dead": [],
+  "statuses": {
+    "A1": "CITED",
+    "A2": "CONDITIONAL",
+    "A3": "CONDITIONAL",
+    "A4": "CONDITIONAL",
+    "A5": "CONDITIONAL",
+    "A6": "PROVED-INFORMAL",
+    "A7": "PROVED-INFORMAL",
+    "A8": "PROVED-INFORMAL",
+    "A9": "PROVED-INFORMAL",
+    "A34": "PROVED",
+    "A35": "PROVED",
+    "A10": "PROVED-INFORMAL",
+    "A11": "PROVED-INFORMAL",
+    "A12": "CONDITIONAL",
+    "A13": "PROVED-INFORMAL",
+    "A14": "PROVED-INFORMAL",
+    "A15": "PROVED-INFORMAL",
+    "A16": "PROVED-INFORMAL",
+    "A17": "PROVED-INFORMAL",
+    "A18": "PROVED-INFORMAL",
+    "A19": "PROVED-INFORMAL",
+    "A20": "PROVED-INFORMAL",
+    "A21": "PROVED-INFORMAL",
+    "A22": "PROVED-INFORMAL",
+    "A23": "PROVED-INFORMAL",
+    "A24": "PROVED-INFORMAL",
+    "A25": "PROVED-INFORMAL",
+    "A26": "OPEN",
+    "A27": "OPEN",
+    "A28": "CONDITIONAL",
+    "A29": "CONDITIONAL",
+    "A30": "CONDITIONAL",
+    "A31": "CONDITIONAL",
+    "A32": "CITED",
+    "A33": "CITED"
+  },
+  "scored": [
+    {
+      "id": "A9",
+      "status": "PROVED-INFORMAL",
+      "fan_in": 3,
+      "n_deps": 0,
+      "statement_chars": 46,
+      "score": 2.8083,
+      "attempts": 0
+    },
+    {
+      "id": "A8",
+      "status": "PROVED-INFORMAL",
+      "fan_in": 2,
+      "n_deps": 0,
+      "statement_chars": 113,
+      "score": 1.5292,
+      "attempts": 0
+    },
+    {
+      "id": "A3",
+      "status": "CONDITIONAL",
+      "fan_in": 2,
+      "n_deps": 0,
+      "statement_chars": 181,
+      "score": 1.2458,
+      "attempts": 0
+    },
+    {
+      "id": "A19",
+      "status": "PROVED-INFORMAL",
+      "fan_in": 1,
+      "n_deps": 0,
+      "statement_chars": 94,
+      "score": 0.6083,
+      "attempts": 0
+    },
+    {
+      "id": "A7",
+      "status": "PROVED-INFORMAL",
+      "fan_in": 1,
+      "n_deps": 0,
+      "statement_chars": 123,
+      "score": 0.4875,
+      "attempts": 0
+    },
+    {
+      "id": "A28",
+      "status": "CONDITIONAL",
+      "fan_in": 1,
+      "n_deps": 0,
+      "statement_chars": 162,
+      "score": 0.325,
+      "attempts": 0
+    },
+    {
+      "id": "A16",
+      "status": "PROVED-INFORMAL",
+      "fan_in": 0,
+      "n_deps": 0,
+      "statement_chars": 48,
+      "score": -0.2,
+      "attempts": 0
+    },
+    {
+      "id": "A18",
+      "status": "PROVED-INFORMAL",
+      "fan_in": 0,
+      "n_deps": 0,
+      "statement_chars": 50,
+      "score": -0.2083,
+      "attempts": 0
+    },
+    {
+      "id": "A17",
+      "status": "PROVED-INFORMAL",
+      "fan_in": 0,
+      "n_deps": 0,
+      "statement_chars": 58,
+      "score": -0.2417,
+      "attempts": 0
+    },
+    {
+      "id": "A26",
+      "status": "OPEN",
+      "fan_in": 0,
+      "n_deps": 0,
+      "statement_chars": 59,
+      "score": -0.2458,
+      "attempts": 0
+    },
+    {
+      "id": "A6",
+      "status": "PROVED-INFORMAL",
+      "fan_in": 0,
+      "n_deps": 0,
+      "statement_chars": 70,
+      "score": -0.2917,
+      "attempts": 0
+    }
+  ]
+}
