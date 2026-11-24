@@ -165,10 +165,38 @@ We are explicit, because the framing invites overstatement.
 
 \subsection{Format}
 
-The ledger is a Markdown table with six columns: identifier, state, statement,
-\Lean{} declaration (if any), dependencies, and notes. It is deliberately a
-human-readable file rather than a serialization format, because it has to be
-read and edited by the author and eventually typeset as an appendix.
+The ledger is a Markdown table with seven columns: identifier, state,
+statement, \Lean{} declaration (if any), dependencies, comprehension, and
+notes. It is deliberately a human-readable file rather than a serialization
+format, because it has to be read and edited by the author and eventually
+typeset as an appendix.
+
+\paragraph{Why a comprehension column.} Machine-checking answers whether a
+proposition follows from the axioms. It does not answer whether anyone knows
+why. The two facts are usually the same and, at scale, they separate: a proof
+may be accepted by the kernel while no person can reconstruct the argument.
+Rather than invent a seventh state, the ledger carries the distinction as a
+column with three values, and requires it of every \claim{PROVED} row:
+
+\begin{center}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Value & Meaning \\
+\midrule
+\code{yes} & someone can explain the argument \\
+\code{partial} & parts are understood; the note says where the account is
+  being written \\
+\code{no} & accepted by the kernel; not yet understood by anyone \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+A row marked \code{no} or \code{partial} must point, in its note, to where
+the explanation is being written. The gate cannot check that the explanation is
+correct \textemdash{} it can only check that one is owed, and the summary
+counts what is owed. The column is optional at the level of the format: a
+ledger without the header behaves exactly as before, so adopting it is a
+decision the author makes when the question starts to matter.
 
 Two parser details turned out to matter in practice, and both are
 consequences of choosing Markdown:
@@ -188,7 +216,7 @@ consequences of choosing Markdown:
 
 \subsection{What the ledger is checked against}
 
-The ledger gate verifies four things:
+The ledger gate verifies five things:
 
 \begin{enumerate}
 \item every row's state is one of the six legal values;
@@ -197,7 +225,10 @@ The ledger gate verifies four things:
   counterexample;
 \item every \claim{PROVED} row names a declaration that the source actually
   contains, and that declaration appears in the axiom-audit file;
-\item the dependency relation is acyclic.
+\item the dependency relation is acyclic;
+\item when the comprehension column is present, every \claim{PROVED} row
+  carries one of the three values above, and rows marked \code{no} or
+  \code{partial} point to an account.
 \end{enumerate}
 
 The fourth item is not bookkeeping. In our case study the most serious
@@ -263,7 +294,7 @@ have seen it made.
 \subsection{What is code}
 
 Everything that can be decided mechanically is implemented in a dependency-free
-Python package of roughly two thousand lines, with 103 unit tests and 13
+Python package of roughly two thousand lines, with 111 unit tests and 13
 self-test scenarios:
 
 \begin{itemize}

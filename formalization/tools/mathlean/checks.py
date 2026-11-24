@@ -202,6 +202,7 @@ def check_ledger(cfg: Config, axiom_map: Optional[Dict[str, set]] = None) -> Res
         audited_names=audited,
         axiom_map=axiom_map,
         allowed_axioms=cfg.allowed_names(),
+        require_understood=ledger_mod.has_understood_column(text),
     )
     details = [str(p) for p in report.problems]
 

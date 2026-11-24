@@ -9,6 +9,62 @@ def doc(*rows):
     return HEADER + "".join(r + "\n" for r in rows)
 
 
+HEADER7 = ("| ID | 状态 | 命题 | Lean 声明 | 依赖 | 理解 | 备注 |\n"
+           "|---|---|---|---|---|---|---|\n")
+
+
+def doc7(*rows):
+    return HEADER7 + "".join(r + "\n" for r in rows)
+
+
+class UnderstoodTest(unittest.TestCase):
+    def test_parsed_when_header_has_column(self):
+        rows = ledger.parse(doc7("| C1 | PROVED | 甲 | Foo.a | — | no | 见 GUIDE |"))
+        self.assertEqual(len(rows), 1)
+        self.assertEqual(rows[0].understood, "no")
+        self.assertEqual(rows[0].note, "见 GUIDE")
+
+    def test_legacy_six_columns_unaffected(self):
+        rows = ledger.parse(doc("| C1 | PROVED | 甲 | Foo.a | — | 说明 |"))
+        self.assertEqual(rows[0].understood, "")
+        self.assertEqual(rows[0].note, "说明")
+
+    def test_header_detection(self):
+        self.assertTrue(ledger.has_understood_column(doc7()))
+        self.assertFalse(ledger.has_understood_column(doc()))
+
+    def test_proved_requires_understood(self):
+        rows = ledger.parse(doc7("| C1 | PROVED | 甲 | Foo.a | — | — | 说明 |"))
+        rep = ledger.validate(rows, decls=["Foo.a"], require_understood=True)
+        self.assertTrue(any("理解状态" in p.message for p in rep.errors))
+
+    def test_illegal_value(self):
+        rows = ledger.parse(doc7("| C1 | PROVED | 甲 | Foo.a | — | maybe | 说明 |"))
+        rep = ledger.validate(rows, decls=["Foo.a"], require_understood=True)
+        self.assertTrue(any("非法理解状态" in p.message for p in rep.errors))
+
+    def test_no_or_partial_needs_a_pointer(self):
+        rows = ledger.parse(doc7("| C1 | PROVED | 甲 | Foo.a | — | partial | — |"))
+        rep = ledger.validate(rows, decls=["Foo.a"], require_understood=True)
+        self.assertTrue(any("解读写在哪里" in p.message for p in rep.errors))
+        rows = ledger.parse(doc7("| C1 | PROVED | 甲 | Foo.a | — | partial | 见 GUIDE §2 |"))
+        rep = ledger.validate(rows, decls=["Foo.a"], audited_names=None, require_understood=True)
+        self.assertFalse(rep.errors)
+
+    def test_non_proved_may_leave_blank(self):
+        rows = ledger.parse(doc7("| C1 | OPEN | 甲 | — | — | — | 卡在引理 3 |"))
+        rep = ledger.validate(rows, audited_names=None, require_understood=True)
+        self.assertFalse(rep.errors)
+
+    def test_summary_reports_counts(self):
+        rows = ledger.parse(doc7(
+            "| C1 | PROVED | 甲 | Foo.a | — | yes | 说明 |\n"
+            "| C2 | PROVED | 乙 | Foo.b | — | no | 见 GUIDE |"))
+        rep = ledger.validate(rows, decls=["Foo.a", "Foo.b"], require_understood=True)
+        text = ledger.summarize(rep)
+        self.assertIn("理解 yes 1 / no 1", text)
+
+
 class ParseTest(unittest.TestCase):
     def test_basic(self):
         rows = ledger.parse(doc("| C1 | PROVED | 甲 | Foo.a | — | 说明 |"))

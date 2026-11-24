@@ -24,7 +24,7 @@ OK
 
 | | 谁做 | 有没有测试 |
 |---|---|---|
-| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，103 个单元测试 + 13 个自检场景 |
+| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，111 个单元测试 + 13 个自检场景 |
 | 证明、找反例、对抗审计、形式化、陈述保真 | `workflow.js` 编排的 agent | 靠 P0–P9 的结构与门禁约束 |
 
 确定性部分出错是**可复现的 bug**；agent 部分出错是**判断失误**。两者要用完全不同的办法兜。
@@ -101,7 +101,13 @@ end Challenge
 - `PROVED` 的 Lean 声明必须真实存在，且在 `Audit.lean` 里有 `#print axioms`；
 - `PROVED` 声明的公理集合必须 ⊆ 白名单（默认 `propext`、`Classical.choice`、`Quot.sound`）；
 - `CONDITIONAL` 必须写「假设：……」，`REFUTED` 必须写「反例：……」，`CITED` 必须写「引用：……」；
-- 依赖列引用的 ID 必须存在，且**依赖图不能有环**（循环论证是头号嫌疑）。
+- 依赖列引用的 ID 必须存在，且**依赖图不能有环**（循环论证是头号嫌疑）；
+- 表头有「理解」列时，`PROVED` 行必须写 `yes` / `partial` / `no`，
+  写 `no` 或 `partial` 的备注里必须写明解读写在哪里。
+
+「理解」这一列回答的是另一件事：**机器证明了，有没有人读懂。** Alpöge 的黎曼猜想证明
+就是这个极端情形——kernel 接受、作者本人公开承认还没掌握它。台账里写 `no` 不是认输，
+是把"下一步该写什么"标出来；`ledger` 门的输出会带上 `理解 yes 2 / no 0` 这样的计数。
 
 论文不进 Lean 也能查：`mathlean ledger --file CLAIMS.md --tex paper.tex` 不需要 Lean 工程，
 却会把 `paper.tex` 里每个带 `\label` 的定理/命题/引理/推论/假设拿去和台账对照——
@@ -192,7 +198,7 @@ mathlean/             检查器本体
   scaffold.py           建工程 / vendoring
   doctor.py             环境体检
   selfcheck.py          门禁自检
-tests/                103 个单元测试：python3 -I run_tests.py
+tests/                111 个单元测试：python3 -I run_tests.py
 workflow.js           P0–P9 多 agent 编排
 WORKFLOW.md           方法论：十条铁律、阶段、门禁
 docs/ARCHITECTURE.md  为什么这样分层
