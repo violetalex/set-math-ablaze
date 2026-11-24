@@ -161,6 +161,11 @@ minor 排序）。超预算时停止并在返回值里报 `attack_skipped`——
 前三道门管「证得对不对」，`statement` 门管「证的是不是这句话」，`ledger` 门管
 「说的和写的是不是同一件事」。
 
+**kernel 重放不是门，是另一条验证路径。** `mathlean replay` 用 `leanchecker` 读编译产物、
+不经 elaborator 再验一遍。`build` 走的是 elaborator（宏、tactic、`addDecl` 都在这条路上），
+replay 只走 kernel；两者都过才算"证得对"。它对 `addDecl` / `kexactB` 这类绕过 elaborator
+的构造是唯一有效的检查。局限：`leanchecker` 与工程共用同一个 kernel 实现。
+
 **审计面不是门，是报告。** `mathlean frontier` 从台账的 `PROVED` 行出发，沿项目内部
 声明做传递闭包，收集它们直接从 Mathlib/Init 借来的常量，按「公理 / 数学定理 /
 策略支撑 / 定义与实例 / 语言基础」分类。它不改退出码——因为一个工程借用 500 条

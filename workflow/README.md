@@ -24,7 +24,7 @@ OK
 
 | | 谁做 | 有没有测试 |
 |---|---|---|
-| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，93 个单元测试 + 12 个自检场景 |
+| 脚手架、编译、扫 sorry、公理审计、台账一致性 | `mathlean`（Python，无第三方依赖） | 有，100 个单元测试 + 12 个自检场景 |
 | 证明、找反例、对抗审计、形式化、陈述保真 | `workflow.js` 编排的 agent | 靠 P0–P9 的结构与门禁约束 |
 
 确定性部分出错是**可复现的 bug**；agent 部分出错是**判断失误**。两者要用完全不同的办法兜。
@@ -139,12 +139,33 @@ mathlean new <目录> <库名>      建工程
 mathlean check                  验收（--no-build / --no-audit / --json）
 mathlean ledger --file C.md     只查台账（--tex 顺带核对论文环境覆盖）
 mathlean frontier               算审计面：证明从工程外借用了什么（--write 写 markdown）
+mathlean replay                 把编译产物交给 kernel 重放（不经 elaborator）
 mathlean status                 看工程现状：阶段产物、台账计数、运行记录
 mathlean doctor                 环境体检：elan、lake、Mathlib、配置
 mathlean selfcheck              验证门禁本身按预期工作（12 个场景）
 mathlean upgrade                更新工程里的 tools/
 mathlean version
 ```
+
+## kernel 重放（`replay`）
+
+`build` 门信任的是 elaborator：它展开宏、跑 tactic、允许 `addDecl` 这类逃逸口。
+真正决定证明成立的是 kernel，而 `lake build` 通过并不等于 kernel 接受。
+`mathlean replay` 用 `leanchecker` 读 `.olean`，把每个模块重新交给 kernel 检查：
+
+```
+$ mathlean replay
+Lean      Lean (version 4.34.1, ...)
+Mathlib   d13f23b723b8
+检查器    leanchecker
+✔ Liouville                         24.81s
+```
+
+`leanchecker` 会顺着 import 图把依赖一起检查，所以只跑入口模块就够。
+
+**边界**：`leanchecker` 是 Lean 自带的，与本工程共用同一个 kernel 实现。
+它防的是"elaborator 环节被绕过"，防不了"kernel 本身有 bug"。真正独立的实现
+（nanoda）需要单独安装，`--checker` 参数留了这个口子。
 
 ## 跟着 Claude Code 跑
 
@@ -171,7 +192,7 @@ mathlean/             检查器本体
   scaffold.py           建工程 / vendoring
   doctor.py             环境体检
   selfcheck.py          门禁自检
-tests/                93 个单元测试：python3 -I run_tests.py
+tests/                100 个单元测试：python3 -I run_tests.py
 workflow.js           P0–P9 多 agent 编排
 WORKFLOW.md           方法论：十条铁律、阶段、门禁
 docs/ARCHITECTURE.md  为什么这样分层

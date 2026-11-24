@@ -83,6 +83,20 @@ Scratch/                exploratory files, not built and not part of the library
 tools/                  vendored `mathlean` checker
 ```
 
+## Kernel replay
+
+`bash scripts/check.sh` trusts the elaborator. A second path does not:
+
+```bash
+python3 tools/run_mathlean.py replay
+```
+
+This reads the compiled `.olean` files and replays them through `leanchecker`,
+without going through elaboration. It is the only check that catches a proof
+whose terms were assumed rather than elaborated (`addDecl`, `kexactB`). It uses
+Lean's own kernel, so it does not protect against a kernel bug; `--checker`
+accepts a different implementation.
+
 **Documentation language.** The design and audit documents under `docs/` are
 written in Chinese; this README and all Lean sources are in English. The Lean
 sources are the authority on what is proved — `docs/` explains why each

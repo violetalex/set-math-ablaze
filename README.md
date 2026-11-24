@@ -13,7 +13,7 @@ ledger, and every machine-checked row resolves to a declaration in
 
 | Path | What it is |
 |---|---|
-| [`workflow/`](workflow/) | `mathlean` — a dependency-free Python checker (93 unit tests, 12 self-test scenarios) plus `workflow.js`, the P0–P9 orchestration |
+| [`workflow/`](workflow/) | `mathlean` — a dependency-free Python checker (100 unit tests, 12 self-test scenarios) plus `workflow.js`, the P0–P9 orchestration |
 | [`formalization/`](formalization/) | Lean 4 + Mathlib project: the machine-checked part of paper A |
 | [`papers/a-liouville-ns/`](papers/a-liouville-ns/) | Paper A: a conditional Liouville theorem for ancient axisymmetric Navier–Stokes flow with swirl |
 | [`papers/b-2d-lemma/`](papers/b-2d-lemma/) | Paper B: the two-dimensional bounded-class Liouville lemma that closes paper A's last step |
@@ -51,13 +51,14 @@ The workflow splits work in two:
 ```bash
 # 1. the checker's own tests (no Lean needed)
 cd workflow
-python3 -I run_tests.py        # 93 tests
+python3 -I run_tests.py        # 100 tests
 ./bin/mathlean selfcheck       # 12 scenarios, each gate made to fail on purpose
 
 # 2. the formalization (needs elan; Mathlib is fetched by Lake, ~10 min)
 cd ../formalization
 lake exe cache get
 bash scripts/check.sh
+python3 tools/run_mathlean.py replay   # kernel replay of the compiled artifacts
 ```
 
 `scripts/check.sh` is the single acceptance criterion; it runs six gates:
