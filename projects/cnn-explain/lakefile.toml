@@ -4,7 +4,8 @@ defaultTargets = ["CnnExplain"]
 
 [[require]]
 name = "mathlib"
-path = "/Users/violet/foam-dosing-lean/.lake/packages/mathlib"
+scope = "leanprover-community"
+rev = "v4.34.1"
 
 [[lean_lib]]
 name = "CnnExplain"
