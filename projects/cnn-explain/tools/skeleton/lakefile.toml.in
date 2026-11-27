@@ -4,7 +4,8 @@ defaultTargets = ["__LIB__"]
 
 [[require]]
 name = "mathlib"
-path = "__MATHLIB__"
+scope = "leanprover-community"
+rev = "__LEAN_REV__"
 
 [[lean_lib]]
 name = "__LIB__"

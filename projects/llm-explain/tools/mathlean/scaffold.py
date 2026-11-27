@@ -91,11 +91,27 @@ def _merge_into(src: Path, dst: Path) -> None:
     shutil.rmtree(src, ignore_errors=True)
 
 
-def _substitute(path: Path, lib: str, mathlib: str) -> None:
+def _lean_rev(skel: Path) -> str:
+    """从骨架的 lean-toolchain 读出 Lean 版本，作为 mathlib 的 git tag。
+
+    生成的工程必须能在**任何**机器上构建；把本机 Mathlib 路径写进 lakefile 会让
+    工程只在那台机器上可用（CI 上直接失败）。本地那份 Mathlib 通过 `.lake/packages`
+    的软链提供，不写进 lakefile。
+    """
+    tc = skel / "lean-toolchain"
+    if tc.is_file():
+        text = tc.read_text(encoding="utf-8").strip()
+        if ":" in text:
+            return text.split(":", 1)[1].strip() or "master"
+    return "master"
+
+
+def _substitute(path: Path, lib: str, mathlib: str, lean_rev: str = "master") -> None:
     text = path.read_text(encoding="utf-8")
     new = (text.replace("__LIB_LC__", lib.lower())
                .replace("__LIB__", lib)
-               .replace("__MATHLIB__", mathlib))
+               .replace("__MATHLIB__", mathlib)
+               .replace("__LEAN_REV__", lean_rev))
     if new != text:
         path.write_text(new, encoding="utf-8")
 
@@ -178,9 +194,10 @@ def new_project(dest: Path, lib: str, mathlib: str = "", force: bool = False) ->
     if lake.exists():
         lake.rename(dest / "lakefile.toml")
 
+    lean_rev = _lean_rev(skel)
     for f in dest.rglob("*"):
         if f.is_file() and f.suffix in (".lean", ".toml", ".sh", ".md"):
-            _substitute(f, lib, mathlib)
+            _substitute(f, lib, mathlib, lean_rev)
 
     # 工具与模板
     vendor_tools(dest)
@@ -188,7 +205,7 @@ def new_project(dest: Path, lib: str, mathlib: str = "", force: bool = False) ->
     # 配置
     ini = dest / CONFIG_NAME
     if not ini.is_file():
-        ini.write_text(TEMPLATE.format(lib=lib, mathlib=mathlib,
+        ini.write_text(TEMPLATE.format(lib=lib, mathlib=".lake/packages/mathlib",
                                        allowed=", ".join(DEFAULT_ALLOWED)), encoding="utf-8")
 
     # 文档
