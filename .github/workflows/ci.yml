@@ -41,3 +41,19 @@ jobs:
       - name: Kernel replay
         working-directory: formalization
         run: python3 -I tools/run_mathlean.py replay
+
+  cnn-explain:
+    name: cnn-explain (lean)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build with Lean
+        uses: leanprover/lean-action@v1
+        with:
+          lake-package-directory: projects/cnn-explain
+          build: true
+          test: false
+          lint: false
+      - name: Six gates
+        working-directory: projects/cnn-explain
+        run: bash scripts/check.sh
