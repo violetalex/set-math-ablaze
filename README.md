@@ -1,4 +1,4 @@
-# set-math-ablaze
+# mathlean
 
 One research workflow, and everything it produced.
 

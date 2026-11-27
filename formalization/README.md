@@ -37,8 +37,8 @@ Requires [elan](https://github.com/leanprover/elan). The toolchain is pinned in
 `lake-manifest.json`.
 
 ```bash
-git clone https://github.com/<your-account>/set-math-ablaze.git
-cd set-math-ablaze/formalization
+git clone https://github.com/<your-account>/mathlean.git
+cd mathlean/formalization
 lake exe cache get   # optional: prebuilt Mathlib oleans, much faster
 lake build
 ```
