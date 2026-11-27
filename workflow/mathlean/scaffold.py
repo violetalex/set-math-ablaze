@@ -153,9 +153,9 @@ def new_project(dest: Path, lib: str, mathlib: str = "", force: bool = False) ->
     dest.mkdir(parents=True, exist_ok=True)
     skel = _skeleton_dir()
 
-    # 骨架 → 工程根
+    # 骨架 → 工程根。`Frontier.lean` 是生成用的模板，只进 tools/skeleton，不进工程根。
     for item in skel.iterdir():
-        if item.name in ("scripts",):
+        if item.name in ("scripts", "Frontier.lean"):
             continue
         target = dest / item.name
         if item.is_dir():

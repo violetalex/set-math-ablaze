@@ -1,0 +1,552 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage[capitalise,nameinlink]{cleveref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Lean}{Lean}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\claim}[1]{\textbf{#1}}
+\newcommand{\RR}{\mathbb{R}}
+\newcommand{\NetG}{\mathrm{Net}}
+\newcommand{\VecG}{\mathrm{Vec}}
+\newcommand{\LinOf}{\mathrm{linOf}}
+\newcommand{\PatOf}{\mathrm{patternOf}}
+\newcommand{\RegOf}{\mathrm{regionOf}}
+
+\emergencystretch=1.5em
+
+\title{Exact explanations for piecewise-linear networks are\\
+unique and local: a machine-checked account}
+\author{Fan Li\\[8pt]
+{\small ORCID: 0009-0004-8329-3642}\\[2pt]
+{\small \texttt{56213760@qq.com}}}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Post-hoc explanation methods for neural networks --- saliency maps, Grad-CAM,
+Shapley values --- are heuristics, and the question usually asked of them is
+whether they are faithful. We argue that the question should be replaced by a
+geometric one: for a piecewise-linear network there is an exact local model,
+and one should ask what that model is, whether it is unique, how far from a
+point it remains valid, and what determines its shape.
+
+This paper gives machine-checked answers for a class of convolutional
+networks. We formalize networks as finite compositions of affine maps,
+pointwise ReLU and max-pooling, indexed by an arbitrary finite additive
+commutative semigroup, so that one- and two-dimensional circular convolution
+are instances of the same theorem rather than two theories. We prove that every
+input has an activation pattern whose cell contains it and on which the network
+is exactly the pattern's linearization; that within an explicit neighborhood ---
+given by per-layer margins and pooling gaps --- the linearization remains valid;
+that the linearization is the \emph{unique} affine map agreeing with the
+network on that neighborhood; and that its zero pattern is determined by the
+architecture. We also prove a negative result: with zero padding instead of
+circular boundary, translation equivariance fails, and we exhibit the failure.
+
+Everything is formalized in \Lean{}~4 with Mathlib across twenty ledger entries,
+each with an independently written challenge statement checked against the
+declaration's type. We are explicit about what the formalization does not
+establish: no compactness, no explicit region geometry, and a model class that
+is stylized rather than a production CNN.
+
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+\subsection{The question that explanation methods do not answer}
+
+A great deal of work on interpretability asks whether a particular explanation
+method is \emph{faithful}: whether a saliency map reflects the computations
+that produced a prediction. The answers are necessarily method-by-method, and
+typically empirical.
+
+For piecewise-linear networks there is a sharper object available. Such a
+network is affine on each cell of a finite partition of its input space, so at
+every input there is an \emph{exact} local model: an affine map that agrees
+with the network on a neighborhood of that input. The interesting questions are
+then not about any particular method but about that model:
+
+\begin{enumerate}
+\item Does it exist? (Yes, and its cell contains the point.)
+\item Is it unique? (Yes, on the cell's interior --- which needs proof.)
+\item How far is it valid? (An explicit radius, from margins and pooling gaps.)
+\item What determines its shape? (The architecture, through the receptive
+  field.)
+\end{enumerate}
+
+These are mathematical questions with mathematical answers, and this paper
+gives those answers for a family of convolutional networks, entirely inside a
+proof assistant.
+
+\subsection{What is proved}
+
+The ledger has twenty entries; we highlight six.
+
+\begin{center}
+\begin{tabular}{@{}p{0.07\textwidth}p{0.83\textwidth}@{}}
+\toprule
+Ledger & Statement \\
+\midrule
+C5 & For every network and input $x$ there is a pattern $\sigma$ with
+  $x \in \RegOf(\sigma)$ and $f(y) = \LinOf(\sigma)(y)$ for all $y \in \RegOf(\sigma)$. \\
+C6 & In particular $f(x) = \LinOf(x)(x)$: the prediction is determined by the
+  activation pattern. \\
+C17 & If the margins and pooling gaps at $x$ satisfy a recursive condition
+  $\mathrm{Bounds}$, then the ball of radius $R$ around $x$ lies inside
+  $\RegOf(\sigma)$ --- the linearization is valid on the whole ball. \\
+C18 & The linear map's nonzero entries lie in a recursively defined receptive
+  field: the zero pattern is architectural, not data-dependent. \\
+C20 & If $\mathrm{Bounds}$ holds with $R>0$, every affine map agreeing with
+  the network on that ball \emph{equals} $\LinOf(x)$. The explanation is unique. \\
+C13 & With zero padding instead of a circular boundary, translation
+  equivariance fails; an explicit three-element counterexample is given. \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+C5 and C6 are the familiar statement that a ReLU network is piecewise linear.
+We do not claim them as new mathematics, and
+\cref{sec:limits} says so plainly. C17, C18 and C20 are the parts that a
+statement of the familiar fact does not give: a validity radius, an
+architectural determination of the linear map's sparsity, and uniqueness.
+
+\subsection{What is not claimed}
+
+\begin{itemize}
+\item \textbf{No compactness.} The number of cells grows exponentially with
+  depth; an exact explanation of size polynomial in the network does not exist
+  in general. We prove nothing in that direction and say nothing about
+  ``human-readable'' explanations.
+\item \textbf{No production CNNs.} The formalized class is stylized: equal
+  width at every layer, no downsampling, no flattening or classifier head,
+  bias-free convolution, and only ReLU and max-pooling as nonlinearities.
+  Section~\ref{sec:limits} states this in full.
+\item \textbf{No claim of novelty for the piecewise-linear fact itself}, which
+  is classical.
+\end{itemize}
+
+\subsection{Formalization}
+
+All results are in \Lean{}~4 with Mathlib. Each ledger row with status
+\claim{PROVED} has a declaration whose type has been compared, by the
+elaborator, against a statement written separately in a challenge file; and
+each has been axiom-audited, with the transitive axiom set contained in
+$\{\code{propext}, \code{Classical.choice}, \code{Quot.sound}\}$. A kernel
+replay of the compiled artifacts through \code{leanchecker} also accepts the
+development.
+
+The development was audited by three independent reviewers with different
+lenses (statement fidelity, proof correctness, mathematical content). One
+substantive defect was found and is recorded in \cref{sec:earlier}: a claim in
+an early draft of the ledger that the explanation ``decomposes by receptive
+field'' had no theorem behind it. The theorem now exists (C18).
+
+\section{The model}
+
+\subsection{Index sets}
+
+Fix a finite additive commutative semigroup $G$ with decidable equality. The
+primary instances are $G = \mathbb{Z}/n$ (written \code{Fin n}) for
+one-dimensional circular convolution and $G = \mathbb{Z}/h \times \mathbb{Z}/w$
+for two dimensions. We use \code{AddCommSemigroup} rather than
+\code{AddCommMonoid} deliberately: \code{Fin n} is an additive commutative
+semigroup for every $n$, but a monoid only when $n \ne 0$, and the tensor
+statements should not require a nonzero size.
+
+A \emph{vector} is a function $G \to \RR$, written $\VecG G$; a \emph{matrix} is
+a $\VecG G$-indexed square matrix, written $\mathrm{Mat}\,G$.
+
+\subsection{Layers and networks}
+
+A layer is one of three things:
+\begin{itemize}
+\item an affine map $x \mapsto Ax + b$, with $A$ a matrix and $b$ a vector;
+\item a pointwise ReLU, $x \mapsto (\max(x_i, 0))_i$;
+\item a max-pooling layer, given a family of nonempty windows
+  $(w_i)_{i \in G}$ with $w_i \subseteq G$, sending $x$ to
+  $({\max_{j \in w_i} x_j})_i$.
+\end{itemize}
+A network is a finite list of layers, evaluated by composition.
+
+Convolution is not a separate constructor: it is a particular affine layer,
+whose matrix is circulant (Section~\ref{sec:structure}). This is the design
+decision that keeps the development to one theory.
+
+\section{Exact linearization}
+
+\subsection{Patterns and their regions}
+
+For a vector $x$, the ReLU \emph{pattern} records which coordinates are
+positive:
+\[
+  \pi(x)_i \;=\; [\,0 < x_i\,] \in \{\mathrm{true}, \mathrm{false}\}.
+\]
+The branch convention matters: $x_i = 0$ is recorded as $\mathrm{false}$, and
+since $\max(0,0) = 0$ agrees with the closed branch, the linearization below is
+exact on the \emph{closed} cell, not merely its interior (ledger C7).
+
+A pooling layer contributes a different kind of pattern: the coordinate at
+which each window attains its maximum. Since ties may occur, we fix a choice
+function; the value of the explanation does not depend on which tied coordinate
+is chosen, only the representation does.
+
+A pattern of a network is therefore a list of items, each either a ReLU switch
+vector or a pooling choice; its length equals the number of ReLU and pooling
+layers.
+
+\subsection{A forward recursion}
+
+The linearization must be computed \emph{forward}. The reason is structural:
+the pattern of a ReLU layer depends on that layer's own input, which is the
+prefix of the network applied to $x$. One cannot decide the patterns first and
+compute the prefix afterwards.
+
+The recursion \code{walk} carries three things: the current value, the affine
+map from the original input to the current value, and the patterns collected so
+far. An affine layer composes on the way back without adding a pattern; a ReLU
+layer adds its switch pattern and composes with the corresponding diagonal
+$0/1$ matrix; a pooling layer adds its choice and composes with the
+corresponding selection matrix.
+
+From \code{walk} we read off $\LinOf(\mathrm{net}, x)$, the affine map, and
+$\PatOf(\mathrm{net}, x)$, the pattern list. The region is the fibre of the
+pattern map,
+\[
+  \RegOf(\sigma) \;=\; \{\, y : \PatOf(\mathrm{net}, y) = \sigma \,\}.
+\]
+
+\subsection{The theorem}
+
+\begin{theorem}[Ledger C5]
+For every network $\mathrm{net}$ and input $x$,
+\[
+  x \in \RegOf(\PatOf(x)) \quad\text{and}\quad
+  \forall y \in \RegOf(\PatOf(x)),\ \ f(y) = \LinOf(x)(y).
+\]
+\end{theorem}
+
+The proof is an induction on the layer list whose hypothesis is equality of
+\emph{pattern sequences}, not equality of inputs. The base case is the identity;
+the affine step transports the hypothesis along the affine map; the ReLU and
+pooling steps use, respectively, that a ReLU layer equals its own
+linearization (C3) and that a pooling layer equals the selection matrix at its
+own choice (the pooling half of C10).
+
+The corollary is the completeness statement: $f(x) = \LinOf(x)(x)$ (ledger C6).
+The prediction is determined by the activation pattern, and the determination
+is an explicit affine formula.
+
+\section{Structure}\label{sec:structure}
+
+\subsection{Convolution is circulant}
+
+Index arithmetic in \code{Fin n} is modular. Subtraction modulo $n$ is painful
+to formalize, so the convolution is written with addition only:
+\[
+  (k \star x)_i \;=\; \sum_{m} k_m\, x_{i+m}.
+\]
+This is cross-correlation in the usual machine-learning terminology; because
+$k$ ranges over the whole index set it equals the convolution with the flipped
+kernel, so no result depends on the naming, but the paper must use the correct
+word.
+
+The associated matrix is $A_{ij} = \sum_m [\,j = i+m\,]\, k_m$, a circulant,
+and the bridge $A x = k \star x$ is proved (so the convolution is an affine
+layer in the sense of Section 2). The mathematical content of ``circulant'' is
+that convolution commutes with translation:
+\[
+  k \star (x \circ \tau_t) \;=\; (k \star x) \circ \tau_t ,
+\]
+where $\tau_t$ shifts the index by $t$ (ledger C8).
+
+\subsection{Pooling is selection}
+
+A pooling layer is not affine and not pointwise, so it cannot be an affine
+layer. What saves it is that it is a \emph{selection}: at every input the
+maximum over each window is attained at some coordinate, and the pooling layer
+equals the matrix selecting those coordinates (ledger C9). The choice of tied
+coordinate is arbitrary but the value is not.
+
+\subsection{The receptive field}
+
+The linearization of a whole network is a single dense matrix, but its zero
+pattern is not arbitrary. Define, backwards through the layers, the set of
+input coordinates on which output coordinate $i$ can depend:
+\begin{itemize}
+\item affine: the union, over the current support, of the nonzero rows of $A$;
+\item ReLU: keep only the coordinates whose switch is on;
+\item pooling: replace $j$ by the chosen coordinate $c_j$.
+\end{itemize}
+\begin{theorem}[Ledger C18]
+If the linear map's $(i,j)$ entry is nonzero, then $j$ lies in this set.
+\end{theorem}
+The zero pattern is thus determined by the architecture; the input enters only
+through the pooling choices. This is what ``the explanation decomposes by
+receptive field'' should mean, and it is now a theorem rather than a phrase.
+
+\subsection{Two dimensions}
+
+Because the index type is an arbitrary finite additive commutative semigroup,
+two-dimensional circular convolution requires no new proof: it is the same
+theorem at $G = \mathbb{Z}/h \times \mathbb{Z}/w$ (ledger C11). The convolution
+and the network both instantiate, and the equivariance statement likewise
+(C12). One theorem, two instances.
+
+\section{The boundary}
+
+Circular convolution has no boundary: index addition wraps, translation is a
+bijection, and equivariance is unconditional. Zero padding introduces a
+boundary, and the price is exactly local equivariance. Rather than state a
+weakened positive result, we state and prove the failure, with a witness
+(ledger C13): with $n = 3$, a kernel keeping only offset $1$, input
+$[1,2,3]$ and a shift by $1$,
+\[
+  \operatorname{conv}(K, \text{shift}\,x) = [3,1,0], \qquad
+  \text{shift}(\operatorname{conv}(K,x)) = [3,0,2],
+\]
+which differ at coordinate $1$. The reason is local: at output coordinate $2$
+the offset leaves the grid and is filled with $0$, while the shifted input sees
+a value there.
+
+\section{Local validity}\label{sec:radius}
+
+Existence of an explanation at a point does not say how far from that point the
+explanation can be trusted. This section gives an explicit neighborhood.
+
+\subsection{Stability of switches and choices}
+
+Two elementary facts.
+
+\begin{lemma}[Ledger C14]
+If every coordinate of $x$ is at distance at least $\varepsilon$ from $0$, and
+$y$ differs from $x$ coordinatewise by at most $\varepsilon$, then $y$ and $x$
+have the same ReLU pattern.
+\end{lemma}
+
+\begin{lemma}[Ledger C15]
+If, at $x$, every pooling window's maximum exceeds its other entries by at
+least $\delta$, and $y$ differs from $x$ coordinatewise by at most
+$\delta/2$, then $y$ and $x$ have the same pooling choices.
+\end{lemma}
+
+The strictness in C15 is not cosmetic: the choice is an arbitrary function of
+the input, so under a tie a different input may choose differently. A strict
+gap rules out ties on the whole neighborhood.
+
+Two conventions deserve comment. We write closeness \emph{non-strictly}
+($|y_i - x_i| \le r$), because the Lipschitz estimate for a maximum is
+non-strict and the inequality propagates through pooling; the margins and gaps
+are correspondingly strict. And the affine step of the recursion multiplies the
+radius by $\max(\|A\|_\infty, 1)$ rather than $\|A\|_\infty$, purely to keep
+the radius positive when $A = 0$; this is conservative, not tight.
+
+\subsection{The recursive radius}
+
+A predicate $\mathrm{Bounds}(\mathrm{net}, x, R)$ collects the per-layer
+conditions along the trajectory: at each ReLU layer, $R$ is below every
+coordinate's distance from $0$; at each pooling layer, $2R$ is below every
+window's gap; at each affine layer, the radius is multiplied by the row-sum
+norm.
+
+\begin{theorem}[Ledger C16]
+If $R > 0$ and $\mathrm{Bounds}(\mathrm{net}, x, R)$ holds, then any $y$ with
+$|y_i - x_i| \le R$ for all $i$ has the same pattern sequence as $x$.
+\end{theorem}
+
+\begin{corollary}[Ledger C17]
+Under the same hypotheses, the ball of radius $R$ around $x$ is contained in
+$\RegOf(\PatOf(x))$; hence the linearization $\LinOf(x)$ agrees with the network on
+that whole ball.
+\end{corollary}
+
+$\mathrm{Bounds}$ is a recursive predicate rather than a closed-form number on
+purpose: a formula would have to hide the per-layer hypotheses that make the
+bound true.
+
+\section{Uniqueness}
+
+Existence and validity still leave open whether the linearization is \emph{the}
+explanation or merely one of many. It is the former.
+
+\begin{lemma}[Ledger C19]
+Two affine maps that agree on a ball of positive radius are equal.
+\end{lemma}
+
+The proof is short and classical: compare the constant terms at the centre, and
+the $k$-th columns at the centre displaced by $(r/2)e_k$.
+
+\begin{theorem}[Ledger C20]
+If $R > 0$ and $\mathrm{Bounds}(\mathrm{net},x,R)$ holds, then every affine map
+that agrees with the network on the ball of radius $R$ around $x$ \emph{equals}
+$\LinOf(x)$.
+\end{theorem}
+
+The proof uses C17 to place the ball inside the region and C19 to compare.
+The consequence is a change of status: an explanation is not a representation
+one chooses among many, but a property the network determines. Approximate
+explanation methods can then be described precisely --- they approximate a
+particular object --- rather than compared to one another empirically.
+
+Note that C17, which we first regarded as a refinement, is in fact the
+hypothesis of uniqueness: it is what supplies an open set on which two affine
+maps can be compared.
+
+\section{What is not established}\label{sec:limits}
+
+\begin{enumerate}
+\item \textbf{The piecewise-linear fact is classical.} C5 and C6 restate, in a
+  proof assistant, that a ReLU network is affine on each activation cell. The
+  proof is an induction over the layer list; there is no new lemma of substance
+  in it. Papers on linear regions have long used the fact; what they add is
+  counting, which we do not do.
+\item \textbf{No compactness.} The number of cells grows exponentially with
+  depth, so no exact explanation of polynomial size exists in general. Nothing
+  here contradicts that, and nothing here gives a lower bound either.
+\item \textbf{No explicit region geometry.} $\RegOf(\sigma)$ is defined as a
+  fibre of the pattern map, not as an intersection of half-spaces. It is
+  convex and has nonempty interior when $\mathrm{Bounds}$ holds (by C17), but
+  we do not state it that way, and we give no description of the region's
+  faces.
+\item \textbf{A stylized class.} Equal width throughout; no downsampling,
+  stride, flattening or classifier head; bias-free convolution; only ReLU and
+  max-pooling. For a production CNN these results are vacuous, not false.
+\item \textbf{Noncomputable constructions.} The pattern function uses
+  \code{decide} on a real inequality, and the pooling choice uses
+  \code{Classical.choose}; neither computes. ``Machine-checkable'' holds in the
+  kernel sense, not the executable sense.
+\end{enumerate}
+
+\section{Related work}
+
+The piecewise-linear structure of ReLU networks and the counting of linear
+regions are studied in \cite{montufar,telgarsky,arora}. Explanation methods
+form a large literature; \cite{lime,shap,gradcam,ig} are representatives. The
+present work does not propose a method; it formalizes the object such methods
+approximate.
+
+Formal verification of neural networks has concentrated on robustness
+certification and on verifying properties of trained networks, typically with
+interval or abstract interpretation rather than in a general proof assistant.
+Our contribution is complementary: a specification-level account of what an
+explanation \emph{is}, in the same environment used for the rest of
+mathematics.
+
+\section{Formalization notes}\label{sec:earlier}
+
+Three points about the process, recorded because they bear on the results.
+
+\paragraph{The statement gate.} Every \claim{PROVED} row has a challenge
+declaration in a separate file, and a script checks that the challenge's type
+and the theorem's type are definitionally equal. The check caught an error on
+its first run: the challenge quantified the index explicitly while the theorem
+had it implicit. That is not a mathematical difference, but it is a difference,
+and the gate is deliberately stricter than mathematics.
+
+\paragraph{The audit.} Three independent reviewers examined the development
+with different lenses. The mathematical-content reviewer found the substantive
+defect mentioned in the introduction: the ledger asserted a receptive-field
+decomposition that no theorem supported. It also concluded that, at that stage,
+the theorem was not sufficient as a paper's main result. The radius (C14--C17),
+the receptive field (C18) and uniqueness (C19--C20) were added in response.
+
+\paragraph{Persistent limitation.} The reviewers share the author's model
+family. This is a residual limitation of the audit, not a claim of independent
+human review.
+
+\appendix
+
+\section{The ledger}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+ID & Content & Shape \\
+\midrule
+C1 & affine composition & base algebra \\
+C2 & affine base case & induction base \\
+C3 & ReLU linearization & induction base \\
+C4 & induction step & engine \\
+C5 & exact linearization & main \\
+C6 & completeness corollary & corollary \\
+C7 & boundary agreement at $z=0$ & convention \\
+C8 & convolution commutes with shifts & structure \\
+C9 & pooling is a selection & structure \\
+C10 & CNN instance & instance \\
+C11 & two-dimensional CNN & instance \\
+C12 & two-dimensional equivariance & instance \\
+C13 & zero padding breaks equivariance & negative \\
+C14 & ReLU switch stability & local \\
+C15 & pooling choice stability & local \\
+C16 & recursive radius & local \\
+C17 & the ball is inside the region & local \\
+C18 & receptive field & structure \\
+C19 & affine uniqueness on a ball & uniqueness \\
+C20 & the explanation is unique & uniqueness \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{thebibliography}{99}
+
+\bibitem{montufar}
+G.~Mont\'ufar, R.~Pascanu, K.~Cho, and Y.~Bengio.
+\newblock On the number of linear regions of deep neural networks.
+\newblock \emph{Advances in Neural Information Processing Systems}, 2014.
+\newblock arXiv:1402.1869.
+
+\bibitem{telgarsky}
+M.~Telgarsky.
+\newblock Benefits of depth in neural networks.
+\newblock \emph{Conference on Learning Theory}, 2016.
+\newblock arXiv:1602.04485.
+
+\bibitem{arora}
+R.~Arora, A.~Basu, P.~Mianjy, and A.~Mukherjee.
+\newblock Understanding deep neural networks with rectified linear units.
+\newblock \emph{International Conference on Learning Representations}, 2018.
+\newblock arXiv:1611.01491.
+
+\bibitem{lime}
+M.~T. Ribeiro, S.~Singh, and C.~Guestrin.
+\newblock ``Why should I trust you?'': explaining the predictions of any
+  classifier.
+\newblock \emph{ACM SIGKDD}, 2016.
+\newblock arXiv:1602.04938.
+
+\bibitem{shap}
+S.~M. Lundberg and S.-I. Lee.
+\newblock A unified approach to interpreting model predictions.
+\newblock \emph{Advances in Neural Information Processing Systems}, 2017.
+\newblock arXiv:1705.07874.
+
+\bibitem{gradcam}
+R.~R. Selvaraju, M.~Cogswell, A.~Das, R.~Vedantam, D.~Parikh, and D.~Batra.
+\newblock Grad-CAM: visual explanations from deep networks via gradient-based
+  localization.
+\newblock \emph{International Conference on Computer Vision}, 2017.
+\newblock arXiv:1610.02391. doi:10.1109/ICCV.2017.74.
+
+\bibitem{ig}
+M.~Sundararajan, A.~Taly, and Q.~Yan.
+\newblock Axiomatic attribution for deep networks.
+\newblock \emph{International Conference on Machine Learning}, 2017.
+\newblock arXiv:1703.01365.
+
+\end{thebibliography}
+
+\end{document}

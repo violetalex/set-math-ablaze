@@ -7,6 +7,7 @@ Three papers, all written under the procedure in [`../workflow/`](../workflow/).
 | [`a-liouville-ns/`](a-liouville-ns/) | A conditional Liouville theorem for ancient axisymmetric Navier–Stokes flow with swirl at the critical endpoint | under review, *SeMA Journal* |
 | [`b-2d-lemma/`](b-2d-lemma/) | A bounded-class Liouville lemma for a two-dimensional steady advection–diffusion equation, and the classes where it holds | under review, *SeMA Journal* |
 | [`c-workflow/`](c-workflow/) | A verification-first workflow for research mathematics | draft |
+| `../projects/cnn-explain/paper/` | Exact explanations for piecewise-linear networks are unique and local | draft |
 
 Every theorem, proposition, lemma and substantive remark in A and B has a row
 in [`../CLAIMS.md`](../CLAIMS.md). Two rows are machine-checked in

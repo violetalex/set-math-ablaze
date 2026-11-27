@@ -1,0 +1,10 @@
+name = "cnnexplain"
+version = "0.1.0"
+defaultTargets = ["CnnExplain"]
+
+[[require]]
+name = "mathlib"
+path = "/Users/violet/foam-dosing-lean/.lake/packages/mathlib"
+
+[[lean_lib]]
+name = "CnnExplain"

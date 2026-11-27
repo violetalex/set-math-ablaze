@@ -2,12 +2,18 @@
 
 One research workflow, and everything it produced.
 
-This repository contains a tool, the staging procedure it enforces, three
-papers written under that procedure, and the Lean 4 formalization that came out
+This repository contains a tool, the staging procedure it enforces, four
+papers written under that procedure, and the Lean 4 formalizations that came out
 of it. The point of putting them in one place is that the papers are not
 independent of the workflow: every theorem in them resolves to a row of a
-ledger, and every machine-checked row resolves to a declaration in
-`formalization/`.
+ledger, and every machine-checked row resolves to a declaration in this
+repository.
+
+There are two case studies, and they were run in opposite directions. The
+Liouville project is a paper first, with one lemma that turned out to be
+formalizable. The CNN project was written from the formalization outward: the
+theorem was chosen because it could be stated precisely, and the paper says
+what the twenty proved rows actually give.
 
 ## What is here
 
@@ -15,6 +21,7 @@ ledger, and every machine-checked row resolves to a declaration in
 |---|---|
 | [`workflow/`](workflow/) | `mathlean` — a dependency-free Python checker (123 unit tests, 13 self-test scenarios) plus `workflow.js`, the P0–P9 orchestration |
 | [`formalization/`](formalization/) | Lean 4 + Mathlib project: the machine-checked part of paper A |
+| [`projects/cnn-explain/`](projects/cnn-explain/) | Second case study: exact explanations for piecewise-linear networks are unique and local. 20 ledger rows, all `PROVED`; the paper is in `paper/` |
 | [`papers/a-liouville-ns/`](papers/a-liouville-ns/) | Paper A: a conditional Liouville theorem for ancient axisymmetric Navier–Stokes flow with swirl |
 | [`papers/b-2d-lemma/`](papers/b-2d-lemma/) | Paper B: the two-dimensional bounded-class Liouville lemma that closes paper A's last step |
 | [`papers/c-workflow/`](papers/c-workflow/) | A methods paper describing the workflow itself, with papers A and B as the case study |
@@ -54,11 +61,15 @@ cd workflow
 python3 -I run_tests.py        # 123 tests
 ./bin/mathlean selfcheck       # 12 scenarios, each gate made to fail on purpose
 
-# 2. the formalization (needs elan; Mathlib is fetched by Lake, ~10 min)
+# 2. the Liouville formalization (needs elan; Mathlib is fetched by Lake, ~10 min)
 cd ../formalization
 lake exe cache get
 bash scripts/check.sh
 python3 tools/run_mathlean.py replay   # kernel replay of the compiled artifacts
+
+# 3. the CNN project (same six gates, 20 of 20 rows PROVED)
+cd ../projects/cnn-explain
+bash scripts/check.sh
 ```
 
 `scripts/check.sh` is the single acceptance criterion; it runs six gates:
@@ -76,6 +87,19 @@ The design documents under `formalization/docs/` are written in Chinese; the
 Lean sources and this README are in English. `formalization/docs/SPEC.md` and
 `docs/FIDELITY.md` are the two to read first — they state what was claimed and
 what the independent audit found.
+
+## How this was made
+
+The formalization, the checker, and the drafts of all four papers were
+developed by Claude Code together with DeepSeek 4.1, under the author's
+direction. The statements, the scope decisions, the accept-or-reject calls on
+audit findings, and every judgement about what is worth claiming are the
+author's.
+
+The workflow exists to make that division checkable rather than a matter of
+trust. Each claim carries the kind of evidence behind it, the machine-checked
+ones can be re-run, and the drafts are marked as drafts. Nothing here is
+presented as autonomous work.
 
 ## What is not claimed
 
