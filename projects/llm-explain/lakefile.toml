@@ -1,0 +1,10 @@
+name = "llmexplain"
+version = "0.1.0"
+defaultTargets = ["LlmExplain"]
+
+[[require]]
+name = "mathlib"
+path = "/Users/violet/foam-dosing-lean/.lake/packages/mathlib"
+
+[[lean_lib]]
+name = "LlmExplain"

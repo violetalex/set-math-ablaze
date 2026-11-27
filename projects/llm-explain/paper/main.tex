@@ -1,0 +1,532 @@
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{mathtools}
+\usepackage{booktabs}
+\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+\usepackage[capitalise,nameinlink]{cleveref}
+
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{remark}[theorem]{Remark}
+
+\newcommand{\Lean}{Lean}
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\R}{\mathbb{R}}
+
+\emergencystretch=1.5em
+
+\title{What a layer's output can tell you about its attention:\\
+an identifiability threshold, machine-checked}
+\author{Fan Li}
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Attention heads are usually studied by asking what they compute. We ask the
+inverse question: what can be recovered from what they output?
+
+For a single softmax attention head, the layer output determines the attention
+weights if and only if the value vectors are affinely independent. Since $n$
+affinely independent points require $n \le d+1$, any context longer than the
+model width plus one admits more than one attention map producing the same
+layer output. We quantify the failure: the weights consistent with a given
+output contain an affine subspace of dimension at least $n-(d+1)$. For a
+2048-token context in a 768-wide model that is a family of dimension at least
+$1279$. A heat map is therefore not ``the'' explanation of a layer's output; it
+is one point in a family whose dimension has an explicit lower bound.
+
+The argument rests on structural facts that we also verify: softmax is a
+probability distribution, attention outputs are convex combinations of the
+values, weights depend only on score differences, and a strictly positive
+minimum weight contracts the token spread by an explicit factor --- the
+mechanism behind rank collapse.
+
+Everything is formalized in \Lean{}~4 with Mathlib: twenty-six declarations,
+no \code{sorry}, axiom set contained in $\{\code{propext},
+\code{Classical.choice}, \code{Quot.sound}\}$. The mathematics is elementary
+and we say so; the contribution is the question, the threshold, and the
+machine-checked record.
+
+\end{abstract}
+
+\tableofcontents
+
+\section{Introduction}
+
+\subsection{Two kinds of claim about a model}
+
+A statement about a trained transformer is one of two things. It is either a
+statement about \emph{the architecture} --- true for every admissible choice of
+weights --- or a statement about \emph{this model}, established by probing,
+ablating or measuring it. The two have different evidence, and they are easy to
+confuse in prose.
+
+Most of interpretability studies the second kind: a particular head detects a
+particular pattern, a particular direction carries a particular feature. Those
+claims are supported by experiments on one network. The first kind is rarer,
+because the architecture imposes fewer constraints than one would like: a
+softmax head can in principle implement almost any convex combination.
+
+This paper asks what the first kind can buy. Concretely, it studies one
+question about a single attention head, with no reference to weights at all.
+
+\subsection{The question}
+
+An attention head reads a score vector $z$ and a family of value vectors
+$v_1,\dots,v_n$, and emits
+\[
+  \mathrm{out}_d \;=\; \sum_{i=1}^{n} p_i \, v_{i,d},
+  \qquad
+  p_i \;=\; \frac{e^{z_i}}{\sum_j e^{z_j}} .
+\]
+Everyone studies the map $(z,v)\mapsto \mathrm{out}$. We study the inverse
+problem: \emph{given the output, and given the values, is $p$ determined?}
+
+This matters for a familiar practice. Attention maps are drawn as
+explanations: ``the model looked here''. If the map is recoverable from what
+the layer emits, that practice has a mathematical basis. If it is not, then the
+drawn map is one of many maps consistent with exactly the same numbers, and no
+amount of care in drawing it will make it canonical.
+
+\subsection{Results}
+
+The answer is a threshold.
+
+\begin{theorem}[Identifiability, \cref{thm:inj,thm:conv}]
+Fix values $v : I \to \R^D$. The map $p \mapsto \mathrm{out}$ is injective on
+probability vectors if and only if the values are affinely independent.
+\end{theorem}
+
+\begin{theorem}[Obstruction, \cref{thm:dim}]
+Affine independence of $n$ points in $\R^d$ forces $n \le d+1$. When
+$n > d+1$ the values are necessarily dependent, and the weights consistent with
+a given output contain an affine subspace of dimension at least $n-(d+1)$
+(\cref{thm:kerdim,cor:fiber}).
+\end{theorem}
+
+Affine independence is \emph{possible} only for short contexts, $n \le d+1$;
+longer contexts are never identifiable, and there the failure has a computable
+size. Whether a given short context is identifiable is a property of its
+values, not of the architecture.
+
+The remaining results are the scaffolding: the probability and convexity
+facts the argument uses, the score-difference invariance and its converse, a
+gap-controlled approximation, a contraction statement, and two algebraic facts
+about depth. \Cref{sec:structure,sec:dynamic} state the ones we use;
+\cref{app:ledger} tabulates all of them, including those not restated here.
+
+\subsection{What is not claimed}
+
+\begin{itemize}
+\item \textbf{Not about learned weights.} The scores $z$ and values $v$ are
+  free variables, not outputs of projections. The only matrices in the paper
+  are the fixed constants of \cref{prop:depth}; they are given, not trained.
+  Statements about a named model are outside what is formalized; an earlier
+  draft of the specification claimed one and the audit caught it.
+\item \textbf{Not new mathematics, mostly.} The contraction is rank collapse
+  \cite{dong}, the approximation is the softmax-to-argmax estimate
+  \cite{hardattn}, the softmax properties are textbook. The identifiability
+  statement we have not found in the literature, but it is elementary linear
+  algebra and may well be a remark somewhere; see \cref{sec:related}.
+\item \textbf{Not a full transformer.} No multi-head projections, no positional
+  encoding, no normalization in the residual stream, no MLP, no causal mask.
+\end{itemize}
+
+\section{Setting}\label{sec:setup}
+
+Throughout, $I$ and $D$ are finite nonempty sets; $I$ indexes positions and
+$D$ indexes feature coordinates. Nonemptiness is needed because the softmax
+denominator is a sum over $I$. A vector is a function $I \to \R$ or $D \to \R$, and
+$v : I \to D \to \R$ is a family of $|I|$ vectors in $\R^{|D|}$.
+
+\begin{definition}[Softmax and attention]
+For $z : I \to \R$ and $i \in I$,
+\[
+  \mathrm{softmax}(z)_i = \frac{e^{z_i}}{\sum_{j} e^{z_j}},
+  \qquad
+  \mathrm{attn}(p,v)_d = \sum_i p_i\, v_{i,d}.
+\]
+\end{definition}
+
+We write $1$ for the constant function, so that $z + c$ denotes adding the
+constant $c$ to every coordinate.
+
+\section{The identifiability threshold}\label{sec:ident}
+
+\subsection{Invertibility}
+
+\begin{definition}[Affine independence, in the form we use]
+\label{def:affind}
+The values $v : I \to D \to \R$ are affinely independent when the only
+coefficient function $c : I \to \R$ with $\sum_i c_i v_{i,d} = 0$ for every $d$
+and $\sum_i c_i = 0$ is $c = 0$.
+\end{definition}
+
+\begin{theorem}[Identifiability]\label{thm:inj}
+If the values are affinely independent and $p, p'$ are probability vectors
+($\sum p = \sum p' = 1$) with $\mathrm{attn}(p,v) = \mathrm{attn}(p',v)$, then
+$p = p'$.
+\end{theorem}
+
+\begin{proof}
+The difference $c = p - p'$ satisfies $\sum_i c_i v_{i,d} = 0$ for all $d$, by
+subtracting the two outputs, and $\sum_i c_i = 0$ by subtracting the two normalizations.
+Affine independence gives $c = 0$.
+\end{proof}
+
+\begin{theorem}[Converse]\label{thm:conv}
+If the values are affinely dependent, then there exist two distinct probability
+vectors $p \ne p'$ with $\mathrm{attn}(p,v) = \mathrm{attn}(p',v)$.
+\end{theorem}
+
+\begin{proof}
+Take a nontrivial $c$ with $\sum_i c_i v_{i,d} = 0$ for all $d$ and
+$\sum_i c_i = 0$, and let $p$ be the uniform weight $1/n$. For $\epsilon > 0$
+small enough that $p + \epsilon c \ge 0$ coordinatewise, $p' = p + \epsilon c$
+is again a probability vector; its total weight is unchanged because
+$\sum c_i = 0$, and its output is unchanged because $c$ annihilates the values.
+\end{proof}
+
+\Cref{thm:inj,thm:conv} together give the ``if and only if'' of the
+introduction.
+
+\subsection{What the scores contribute}
+
+\begin{proposition}[Converse of translation invariance]\label{prop:shift}
+Two softmax distributions coincide, $\mathrm{softmax}(z) = \mathrm{softmax}(z')$,
+if and only if $z' = z + c$ for some constant $c$.
+\end{proposition}
+
+The forward direction is the familiar shift invariance: adding a constant to
+all scores does not change the weights. The content here is the converse, which
+says softmax quotients the scores by \emph{exactly} one degree of freedom and no
+more. It follows by taking logarithms: $\log \mathrm{softmax}(z)_i = z_i - \log
+\sum_j e^{z_j}$, so equality of two softmax vectors forces the two scores to
+differ by the difference of the two log-partition functions.
+
+Combining \cref{thm:inj,prop:shift}: for affinely independent values, the layer
+output determines the attention weights, and the weights determine the scores up
+to the shift that was never observable to begin with.
+
+\subsection{The obstruction}\label{sec:obstruction}
+
+\begin{theorem}[Dimension]\label{thm:dim}
+Affine independence of $v : I \to D \to \R$ forces $|I| \le |D| + 1$.
+\end{theorem}
+
+\begin{proof}
+Consider the linear map
+\[
+  \Phi : (I \to \R) \to (D \to \R) \times \R, \qquad
+  \Phi(c) = \Big(d \mapsto \sum_i c_i v_{i,d},\ \sum_i c_i\Big).
+\]
+Affine independence says exactly that $\ker \Phi = 0$, i.e.\ that $\Phi$ is
+injective. An injective linear map has domain dimension at most codomain
+dimension, so $|I| \le |D| + 1$.
+\end{proof}
+
+The contrapositive is the statement of interest: once the context is longer
+than the width plus one, \emph{no} values are affinely independent, so
+\cref{thm:inj} never applies. Long contexts are exactly where attention maps
+are most often drawn.
+
+\begin{theorem}[Size of the ambiguity]\label{thm:kerdim}
+For any values, $\dim \ker \Phi \ge |I| - (|D| + 1)$.
+\end{theorem}
+
+\begin{proof}
+Rank--nullity: $\dim(I\to\R) = \dim \operatorname{im}\Phi + \dim \ker \Phi$,
+with $\dim (I\to\R) = |I|$ and $\dim \operatorname{im}\Phi \le \dim((D\to\R)\times\R) = |D|+1$.
+\end{proof}
+
+\begin{corollary}\label{cor:fiber}
+If $c \in \ker \Phi$ and $p$ is any weight vector, then $p + c$ gives the same
+output and the same total weight as $p$.
+\end{corollary}
+
+So the set of explanations consistent with one output is not a pair of points
+but an affine space: of dimension $|I| - \operatorname{rank}\Phi$, and at least
+$|I| - |D| - 1$. A 2048-token context in a 768-wide model has a space of
+explanations of dimension at least $2048 - 768 - 1 = 1279$.
+
+\begin{remark}
+The bound is on the affine space through the explanations, not on its
+intersection with the probability simplex. That intersection is a polytope whose
+dimension can be smaller --- on the boundary of the simplex it can collapse ---
+and computing it is a linear-programming question we do not address.
+\end{remark}
+
+\section{Structural facts}\label{sec:structure}
+
+The proof of \cref{thm:inj} uses only that the weights sum to one. The
+following are the facts about softmax itself that we verify alongside.
+
+\begin{proposition}[Probability]\label{prop:prob}
+$\mathrm{softmax}(z)_i > 0$ for all $i$, and $\sum_i \mathrm{softmax}(z)_i = 1$.
+\end{proposition}
+
+\begin{proposition}[Convexity]\label{prop:conv}
+If $|v_{i,d}| \le M$ for all $i$, then
+$|\mathrm{attn}(\mathrm{softmax}(z),v)_d| \le M$.
+\end{proposition}
+
+The proof uses only that softmax weights are nonnegative and sum to one, so the
+statement holds for any such $p$; we state it for softmax because that is the
+form verified.
+
+\begin{proposition}[Score differences]\label{prop:diff}
+$\mathrm{softmax}(z + c) = \mathrm{softmax}(z)$, and $z_i \le z_j$ implies
+$\mathrm{softmax}(z)_i \le \mathrm{softmax}(z)_j$.
+\end{proposition}
+
+\begin{proposition}[Gap control]\label{prop:gap}
+Let $M$ satisfy $|v_{i,d}| \le M$ for all $i$ and $d$, and let $\delta > 0$. If $i_0$ is the unique
+maximizer of $z$ and every other score is at least $\delta$ below it, then
+\[
+  \mathrm{softmax}(z)_{i_0} \ge \frac{1}{1 + (|I|-1)e^{-\delta}} .
+\]
+Moreover, for \emph{every} $i_0$,
+$\bigl|\mathrm{attn}(\mathrm{softmax}(z),v)_d - v_{i_0,d}\bigr| \le
+(1 - \mathrm{softmax}(z)_{i_0}) \cdot 2M$.
+\end{proposition}
+
+The second half holds without any gap hypothesis; it is the first half that
+makes it informative, by forcing $1 - p_{i_0}$ small. The constant $2M$ is
+sharp: with two positions, $z = 0$, $v = (2,-2)$ and $M = 2$ the bound is
+attained, and replacing $2M$ by $M$ makes it false.
+
+\section{Two dynamical and algebraic facts}\label{sec:dynamic}
+
+\begin{theorem}[Contraction]\label{thm:contract}
+Suppose the weight matrix has rows summing to one with every entry at least
+$m \ge 0$, and the values are real numbers lying in an interval of length $D$.
+Then for any two positions,
+\[
+  \bigl|\mathrm{attn}(p_i, v) - \mathrm{attn}(p_j, v)\bigr|
+  \;\le\; (1 - |I|\,m)\, D ,
+\]
+\end{theorem}
+
+Softmax weights are strictly positive, so $m > 0$ and the factor is strictly
+below one: every layer contracts the spread of the token representations. At
+uniform weights $m = 1/|I|$ the factor is zero, i.e.\ the outputs are already
+identical; at concentrated weights $m \to 0$ the factor tends to one, i.e.\
+hard attention does not contract. The bound interpolates correctly at both ends,
+which is a check on the constant.
+
+This is the one-step mechanism behind rank collapse \cite{dong}: absent
+anything else, repeated application drives the tokens together. We do not
+formalize the iteration; the statement here is for a single layer.
+
+\begin{proposition}[Depth and residuals]\label{prop:depth}
+A linear attention layer $X \mapsto P X W$ composes as
+$(P_2 W_2)\circ(P_1 W_1) = (P_2 P_1, W_1 W_2)$: with fixed matrices, any depth
+collapses to a single layer. With residuals,
+$(1+A)(1+B) = 1 + A + B + AB$: the product introduces the cross term $AB$, which
+neither factor contains on its own. We do not claim that this makes depth
+necessary; see \cref{sec:limits}.
+\end{proposition}
+
+The first half is matrix associativity. Its scope is exactly fixed $P$: in real
+linear attention the weights depend on the input, and the collapse does not
+occur.
+
+\section{Formalization}\label{sec:formal}
+
+The development is in \Lean{}~4 with Mathlib. Every declaration named in the
+ledger has three independent checks: the library builds; a script confirms no
+\code{sorry}, \code{admit}, \code{native\_decide}, \code{implemented\_by} or
+\code{extern} occurs in the sources; and an axiom audit prints the transitive
+axiom set of each public declaration and compares it to $\{\code{propext},
+\code{Classical.choice}, \code{Quot.sound}\}$.
+
+Two further checks are worth describing because they found things.
+
+\paragraph{Statements are compared, not assumed.} Each result has a challenge
+declaration in a separate file, written against the specification; a script
+compares the challenge's type with the theorem's type by definitional equality.
+The check is deliberately stricter than mathematics --- it rejects a difference
+in binder structure that is not a difference in meaning --- and it caught such a
+mismatch on its first run.
+
+\paragraph{Independent audit.} Three reviewers with different lenses (statement
+fidelity, proof correctness, mathematical content) examined the development,
+writing their own test files rather than reading. The correctness reviewer found
+no false theorem; the fidelity reviewer found seven overclaims, all in prose
+rather than in proofs, including a specification that claimed to formalize a
+named frontier architecture when the formalization contains no learned
+projection matrices at all. All seven are fixed and recorded.
+
+\section{Related work}\label{sec:related}
+
+The piecewise-linear structure of ReLU networks and the counting of linear
+regions are studied in \cite{montufar,telgarsky,arora}. Rank collapse --- the
+tendency of pure attention to lose rank with depth --- is established in
+\cite{dong}, with a 2024 literature on its spectral mechanism \cite{gap} and on
+architectural fixes \cite{lambda}. The sharp Lipschitz constant of softmax is
+treated in \cite{lip}. Approximation of hard attention by soft attention is
+studied in \cite{hardattn}. The characterization of choice probabilities that leads to the exponential
+form of the weights goes back to Luce \cite{luce} and McFadden \cite{mcfadden}.
+Two bibliographic qualifications are recorded rather than hidden: the DOI for
+Luce refers to a later reissue, not the 1959 edition, and McFadden's text is a
+book chapter with no chapter-level DOI.
+
+Explainability methods --- LIME, SHAP, Grad-CAM, integrated gradients
+\cite{lime,shap,gradcam,ig} --- produce explanations of a trained model by other
+means. This paper is not a method; it asks what information a layer's output
+contains about its attention at all.
+
+Searches for attention identifiability and invertibility returned no statement
+of \cref{thm:inj}. The closest work \cite{unmask} asks the opposite question:
+recovering the input data from the attention weights and the output. Directions
+differ; whether the question we ask has appeared as a remark elsewhere we cannot
+rule out.
+
+\section{Limitations}\label{sec:limits}
+
+\begin{enumerate}
+\item \textbf{A single head; no learned projections.} There are no projections,
+  no multiple heads, no positional encoding, no normalization, no MLP. The results are about softmax
+  and weighted averages, not about a transformer layer as implemented.
+\item \textbf{Elementary mathematics.} The identifiability theorem is two lines;
+  the dimension bound is rank--nullity. The contribution is the question and the
+  checked record, not depth.
+\item \textbf{The simplex intersection is not computed.} \cref{thm:kerdim}
+  bounds the affine space containing the explanations; the dimension of its
+  intersection with the probability simplex is a linear-programming question we
+  leave open.
+\item \textbf{Not the trained-model question.} Whether a particular model's
+  values are affinely independent is an empirical question about that model. We
+  give the criterion; we do not evaluate it on any network.
+\end{enumerate}
+
+\appendix
+
+\section{The ledger}\label{app:ledger}
+
+\begin{center}
+\begin{tabular}{@{}lll@{}}
+\toprule
+ID & Content & Role \\
+\midrule
+C1--C3 & softmax is a probability distribution & support \\
+C4 & attention output lies in the range of the values & support \\
+C5--C6 & shift invariance, monotonicity & support \\
+C7 & gap-controlled top-1 weight & quantitative \\
+C8 & distance to any single value $\le (1-p)\,2M$ & quantitative \\
+C9 & \code{rms} is homogeneous of degree one & isolated \\
+C10--C11 & residual block range and proxy distance & structural \\
+C12--C13 & softmax is monotone; weighted variance $\ge 0$ & structural \\
+C14--C15 & value path is nonexpansive; block bound & structural \\
+C16--C17 & shift invariance forces a Cauchy equation & partial uniqueness \\
+C18 & depth hierarchy for attention & \textbf{open, not claimed} \\
+C19 & Cauchy classification & \textbf{not formalized} \\
+C20--C21 & fixed-$P$ collapse; residual cross term & algebraic \\
+C22 & attention contracts the token spread & dynamical \\
+C23 & affine independence $\Rightarrow$ identifiability & \textbf{main} \\
+C24 & softmax determines scores up to a constant & main \\
+C25 & affine independence forces $n \le d+1$ & \textbf{main} \\
+C26--C27 & the ambiguity has dimension $\ge n-d-1$ & \textbf{main} \\
+C28 & affine dependence yields a second explanation & main \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\begin{thebibliography}{99}
+
+\bibitem{luce}
+R.~D. Luce.
+\newblock \emph{Individual Choice Behavior: A Theoretical Analysis}.
+\newblock Wiley, 1959. Reissued by Dover, 2005, ISBN 978-0-486-44136-8;
+  doi:10.1037/14396-000 refers to the reissue.
+
+\bibitem{mcfadden}
+D.~McFadden.
+\newblock Conditional logit analysis of qualitative choice behavior.
+\newblock In P.~Zarembka, editor, \emph{Frontiers in Econometrics},
+  Academic Press, New York, 1974. No chapter-level DOI; the volume's details
+  are confirmed by Crossref record doi:10.1017/S0770451800103604.
+
+\bibitem{dong}
+Y.~Dong, J.-B. Cordonnier, and A.~Loukas.
+\newblock Attention is not all you need: pure attention loses rank doubly
+  exponentially with depth.
+\newblock arXiv:2103.03404, 2021.
+
+\bibitem{gap}
+\newblock Mind the gap: a spectral analysis of rank collapse and signal
+  propagation in attention layers.
+\newblock arXiv:2410.07799, 2024.
+
+\bibitem{lambda}
+\newblock Lambda-skip connections: the architectural component that prevents
+  rank collapse.
+\newblock arXiv:2410.10609, 2024.
+
+\bibitem{lip}
+\newblock Softmax is $1/2$-Lipschitz: a tight bound across all $\ell_p$ norms.
+\newblock arXiv:2510.23012, 2025.
+
+\bibitem{hardattn}
+\newblock Simulating hard attention using soft attention.
+\newblock arXiv:2412.09925, 2024.
+
+\bibitem{unmask}
+Y.~Deng, Z.~Song, S.~Xie, and C.~Yang.
+\newblock Unmasking transformers: a theoretical approach to data recovery via
+  attention weights.
+\newblock arXiv:2310.12462, 2023.
+
+\bibitem{montufar}
+G.~Mont\'ufar, R.~Pascanu, K.~Cho, and Y.~Bengio.
+\newblock On the number of linear regions of deep neural networks.
+\newblock \emph{Advances in Neural Information Processing Systems}, 2014.
+\newblock arXiv:1402.1869.
+
+\bibitem{telgarsky}
+M.~Telgarsky.
+\newblock Benefits of depth in neural networks.
+\newblock \emph{Conference on Learning Theory}, 2016.
+\newblock arXiv:1602.04485.
+
+\bibitem{arora}
+R.~Arora, A.~Basu, P.~Mianjy, and A.~Mukherjee.
+\newblock Understanding deep neural networks with rectified linear units.
+\newblock \emph{International Conference on Learning Representations}, 2018.
+\newblock arXiv:1611.01491.
+
+\bibitem{lime}
+M.~T. Ribeiro, S.~Singh, and C.~Guestrin.
+\newblock ``Why should I trust you?'': explaining the predictions of any
+  classifier.
+\newblock \emph{ACM SIGKDD}, 2016.
+\newblock arXiv:1602.04938.
+
+\bibitem{shap}
+S.~M. Lundberg and S.-I. Lee.
+\newblock A unified approach to interpreting model predictions.
+\newblock \emph{Advances in Neural Information Processing Systems}, 2017.
+\newblock arXiv:1705.07874.
+
+\bibitem{gradcam}
+R.~R. Selvaraju, M.~Cogswell, A.~Das, R.~Vedantam, D.~Parikh, and D.~Batra.
+\newblock Grad-CAM: visual explanations from deep networks via gradient-based
+  localization.
+\newblock \emph{International Conference on Computer Vision}, 2017.
+\newblock arXiv:1610.02391. doi:10.1109/ICCV.2017.74.
+
+\bibitem{ig}
+M.~Sundararajan, A.~Taly, and Q.~Yan.
+\newblock Axiomatic attribution for deep networks.
+\newblock \emph{International Conference on Machine Learning}, 2017.
+\newblock arXiv:1703.01365.
+
+\end{thebibliography}
+
+\end{document}

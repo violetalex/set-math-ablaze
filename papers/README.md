@@ -8,6 +8,7 @@ Three papers, all written under the procedure in [`../workflow/`](../workflow/).
 | [`b-2d-lemma/`](b-2d-lemma/) | A bounded-class Liouville lemma for a two-dimensional steady advection–diffusion equation, and the classes where it holds | under review, *SeMA Journal* |
 | [`c-workflow/`](c-workflow/) | A verification-first workflow for research mathematics | draft |
 | `../projects/cnn-explain/paper/` | Exact explanations for piecewise-linear networks are unique and local | draft |
+| `../projects/llm-explain/paper/` | What a layer's output can tell you about its attention | draft |
 
 Every theorem, proposition, lemma and substantive remark in A and B has a row
 in [`../CLAIMS.md`](../CLAIMS.md). Two rows are machine-checked in
